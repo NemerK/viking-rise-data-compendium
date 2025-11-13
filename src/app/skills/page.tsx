@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { skills } from '@/data/skills';
 
-const skillTypes = ['All', 'Cooperation', 'Command', 'Passive', 'Active', 'Counterattack'];
+const skillTypes = ['All', 'Cooperation', 'Command', 'Passive', 'Active', 'Counterattack', 'N/A'];
 
 // Skill Card Component
 function SkillCard({ skill }: { skill: any }) {

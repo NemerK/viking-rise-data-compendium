@@ -411,7 +411,7 @@ export const skills: Skill[] = [
   {
     id: 28,
     name: 'Siege',
-    type: 'N/A',
+    type: "N/A",
     probability: 0,
     description: 'Skill details coming soon.',
     icon: getSkillIcon('Siege'),
@@ -562,7 +562,6 @@ export const skills: Skill[] = [
     icon: getSkillIcon('Blessed by Fate'),
     effects: {
       buff: true,
-      blessing: true
     }
   }
 ];

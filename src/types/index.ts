@@ -8,7 +8,7 @@ export type HeroSeason = 'Base Game' | 'Season 1' | 'Season 2' | 'Season 3' | 'S
 export type HeroSource = 'Base Game' | 'KVK Event' | 'Lucky Wheel' | 'Season Pass' | 'Special Event' | 'Gacha' | 'Valhalla Collaboration';
 
 // Skill Types
-export type SkillType = 'Cooperation' | 'Active' | 'Counterattack' | 'Passive' | 'Command' | 'Awaken';
+export type SkillType = 'Cooperation' | 'Active' | 'Counterattack' | 'Passive' | 'Command' | 'Awaken' | 'N/A';
 
 // Equipment Types
 export type EquipmentType = 'Head' | 'Weapon' | 'Chest' | 'Shoes';
