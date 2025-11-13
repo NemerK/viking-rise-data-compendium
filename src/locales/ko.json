@@ -1,0 +1,171 @@
+{
+  "navigation": {
+    "backToHome": "홈으로 돌아가기",
+    "backToHeroes": "영웅으로 돌아가기",
+    "backToSkills": "스킬로 돌아가기",
+    "backToGuides": "가이드로 돌아가기",
+    "heroes": "영웅",
+    "skills": "스킬",
+    "events": "이벤트",
+    "kvk": "KVK",
+    "guides": "가이드",
+    "teamBuilder": "팀 빌더"
+  },
+  "pages": {
+    "home": {
+      "title": "바이킹 라이즈 컴펜디엄",
+      "subtitle": "바이킹 라이즈 영웅, 스킬, 전략의 완전한 가이드",
+      "heroesSection": "영웅",
+      "skillsSection": "스킬",
+      "f2pSection": "F2P 로드 가이드",
+      "eventsSection": "이벤트",
+      "kvkSection": "킹덤 vs 킹덤"
+    },
+    "heroes": {
+      "title": "영웅 데이터베이스",
+      "subtitle": "바이킹 라이즈의 {count}명 영웅 완전 컬렉션",
+      "searchPlaceholder": "영웅 검색...",
+      "classFilter": "클래스",
+      "seasonFilter": "시즌",
+      "sourceFilter": "출처",
+      "noResults": "검색 조건에 맞는 영웅이 없습니다"
+    },
+    "skills": {
+      "title": "스킬 데이터베이스",
+      "subtitle": "바이킹 라이즈의 {count}개 스킬 완전 컬렉션",
+      "searchPlaceholder": "스킬 검색...",
+      "typeFilter": "타입",
+      "noResults": "검색 조건에 맞는 스킬이 없습니다"
+    },
+    "events": {
+      "title": "이벤트",
+      "subtitle": "바이킹 라이즈의 현재 및 예정된 이벤트"
+    },
+    "kvk": {
+      "title": "킹덤 vs 킹덤",
+      "subtitle": "왕국 간의 궁극의 전투"
+    },
+    "guides": {
+      "title": "플레이어 가이드",
+      "subtitle": "전략 • 팁 • 효율성 가이드",
+      "f2pGuide": "F2P 로드 가이드",
+      "gatheringGuide": "자원 수집 가이드"
+    },
+    "teamBuilder": {
+      "title": "팀 빌더",
+      "subtitle": "완벽한 영웅 팀을 만들고 커스터마이징하세요",
+      "mainCommander": "주 지휘관",
+      "secondaryCommander": "부 지휘관",
+      "createNewTeam": "새 팀 만들기"
+    }
+  },
+  "hero": {
+    "classes": {
+      "Infantry": "보병",
+      "Pikeman": "창병", 
+      "Archer": "궁수",
+      "Porter": "운반자",
+      "Polymath": "다재다능"
+    },
+    "seasons": {
+      "Base Game": "베이스 게임",
+      "Season 1": "시즌 1",
+      "Season 2": "시즌 2", 
+      "Season 3": "시즌 3",
+      "Sx": "시즌 X",
+      "Valhalla Collaboration": "발할라 콜라보레이션"
+    },
+    "sources": {
+      "Base Game": "베이스 게임",
+      "KVK Event": "KVK 이벤트",
+      "Lucky Wheel": "럭키 휠",
+      "Season Pass": "시즌 패스",
+      "Special Event": "특별 이벤트",
+      "Gacha": "가챠",
+      "Valhalla Collaboration": "발할라 콜라보레이션"
+    }
+  },
+  "skill": {
+    "types": {
+      "Cooperation": "협력",
+      "Command": "지휘",
+      "Passive": "패시브",
+      "Active": "액티브",
+      "Counterattack": "반격",
+      "N/A": "N/A"
+    }
+  },
+  "heroes": {
+    "Bjorn": {
+      "name": "비욘",
+      "description": "북쪽에서 온 강력한 전사로, 전투에서의 힘과 용기로 유명합니다."
+    },
+    "Lagertha": {
+      "name": "라게르타", 
+      "description": "전설적인 방패 처녀이자 숙련된 전사로, 그녀와 함께 싸우는 모든 이들에게 존경받습니다."
+    },
+    "Harald": {
+      "name": "하랄드",
+      "description": "비할 데 없는 전투 기술과 전술적 재능을 가진 맹렬한 전사입니다."
+    },
+    "Olena": {
+      "name": "올레나",
+      "description": "치명적인 정확도와 전투에서 비할 데 없는 명중률을 가진 마스터 궁수입니다."
+    },
+    "Artur": {
+      "name": "아르투르",
+      "description": "전문적인 사격술로 전장을 지휘하는 숙련된 궁수입니다."
+    },
+    "Verdandi": {
+      "name": "베르단디",
+      "description": "신성한 힘과 초자연적 능력을 가진 신비로운 궁수입니다."
+    },
+    "Gregory": {
+      "name": "그레고리",
+      "description": "방어 전술과 리더십으로 유명한 확고한 보병 지휘관입니다."
+    },
+    "Yvette": {
+      "name": "이베트",
+      "description": "예외적인 전투 능력과 전략적 사고를 가진 숙련된 창병 전사입니다."
+    }
+  },
+  "skills": {
+    "First Strike": {
+      "name": "선제 공격",
+      "description": "첫 공격으로 적에게 엄청난 피해를 입혀 전투의 결과를 종종 결정합니다."
+    },
+    "Enrage": {
+      "name": "분노", 
+      "description": "공격력과 분노 생성량을 증가시켜 전사가 전투에서 더욱 치명적이 되게 합니다."
+    },
+    "Divine Blessing": {
+      "name": "신성한 축복",
+      "description": "치유와 정화 효과를 제공하여 동맹을 해로부터 보호합니다."
+    },
+    "Odins Asylum": {
+      "name": "오딘의 피난처",
+      "description": "제어 효과에 대한 면역을 부여하여 전사들이 중단 없이 싸울 수 있게 합니다."
+    },
+    "Counter Strike": {
+      "name": "반격",
+      "description": "적의 공격에 대해 파괴적인 반격으로 응답합니다."
+    },
+    "Shield Wall": {
+      "name": "방패 벽",
+      "description": "들어오는 피해를 흡수하는 보호막을 생성합니다."
+    }
+  },
+    "loading": "로딩 중...",
+    "error": "오류",
+    "notFound": "찾을 수 없음",
+    "search": "검색",
+    "filter": "필터",
+    "all": "전체",
+    "close": "닫기",
+    "share": "공유",
+    "copy": "복사",
+    "save": "저장",
+    "cancel": "취소",
+    "confirm": "확인"
+  }
+}

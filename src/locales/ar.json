@@ -1,0 +1,112 @@
+{
+  "navigation": {
+    "backToHome": "العودة للرئيسية",
+    "backToHeroes": "العودة للأبطال",
+    "backToSkills": "العودة للمهارات",
+    "backToGuides": "العودة للأدلة",
+    "heroes": "الأبطال",
+    "skills": "المهارات",
+    "events": "الأحداث",
+    "kvk": "KVK",
+    "guides": "الأدلة",
+    "teamBuilder": "منشئ الفرق"
+  },
+  "pages": {
+    "home": {
+      "title": "موسوعة Viking Rise",
+      "subtitle": "دليلك الشامل لأبطال ومهارات واستراتيجيات Viking Rise",
+      "heroesSection": "الأبطال",
+      "skillsSection": "المهارات",
+      "f2pSection": "دليل F2P",
+      "eventsSection": "الأحداث",
+      "kvkSection": "مملكة ضد مملكة"
+    },
+    "heroes": {
+      "title": "قاعدة بيانات الأبطال",
+      "subtitle": "مجموعة كاملة من {count} بطل في Viking Rise",
+      "searchPlaceholder": "البحث عن الأبطال...",
+      "classFilter": "الفئة",
+      "seasonFilter": "الموسم",
+      "sourceFilter": "المصدر",
+      "noResults": "لم يتم العثور على أبطال يطابقون معاييرك"
+    },
+    "skills": {
+      "title": "قاعدة بيانات المهارات",
+      "subtitle": "مجموعة كاملة من {count} مهارة في Viking Rise",
+      "searchPlaceholder": "البحث عن المهارات...",
+      "typeFilter": "النوع",
+      "noResults": "لم يتم العثور على مهارات تطابق معاييرك"
+    },
+    "events": {
+      "title": "الأحداث",
+      "subtitle": "الأحداث الحالية والقادمة في Viking Rise"
+    },
+    "kvk": {
+      "title": "مملكة ضد مملكة",
+      "subtitle": "المعركة النهائية بين الممالك"
+    },
+    "guides": {
+      "title": "أدلة اللاعبين",
+      "subtitle": "استراتيجيات • نصائح • أدلة الكفاءة",
+      "f2pGuide": "دليل F2P",
+      "gatheringGuide": "دليل جمع الموارد"
+    },
+    "teamBuilder": {
+      "title": "منشئ الفرق",
+      "subtitle": "أنشئ وخصص فرق الأبطال المثالية",
+      "mainCommander": "القائد الرئيسي",
+      "secondaryCommander": "القائد الثانوي",
+      "createNewTeam": "إنشاء فريق جديد"
+    }
+  },
+  "hero": {
+    "classes": {
+      "Infantry": "مشاة",
+      "Pikeman": "رماح", 
+      "Archer": "رماة",
+      "Porter": "حامل",
+      "Polymath": "متعدد المواهب"
+    },
+    "seasons": {
+      "Base Game": "اللعبة الأساسية",
+      "Season 1": "الموسم 1",
+      "Season 2": "الموسم 2", 
+      "Season 3": "الموسم 3",
+      "Sx": "الموسم X",
+      "Valhalla Collaboration": "تعاون فالهالا"
+    },
+    "sources": {
+      "Base Game": "اللعبة الأساسية",
+      "KVK Event": "حدث KVK",
+      "Lucky Wheel": "عجلة الحظ",
+      "Season Pass": "تصريح الموسم",
+      "Special Event": "حدث خاص",
+      "Gacha": "غاتشا",
+      "Valhalla Collaboration": "تعاون فالهالا"
+    }
+  },
+  "skill": {
+    "types": {
+      "Cooperation": "تعاون",
+      "Command": "أمر",
+      "Passive": "سلبي",
+      "Active": "نشط",
+      "Counterattack": "هجوم مضاد",
+      "N/A": "غير متوفر"
+    }
+  },
+  "common": {
+    "loading": "جاري التحميل...",
+    "error": "خطأ",
+    "notFound": "غير موجود",
+    "search": "بحث",
+    "filter": "تصفية",
+    "all": "الكل",
+    "close": "إغلاق",
+    "share": "مشاركة",
+    "copy": "نسخ",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "confirm": "تأكيد"
+  }
+}

@@ -1,0 +1,112 @@
+{
+  "navigation": {
+    "backToHome": "ホームに戻る",
+    "backToHeroes": "ヒーローに戻る",
+    "backToSkills": "スキルに戻る",
+    "backToGuides": "ガイドに戻る",
+    "heroes": "ヒーロー",
+    "skills": "スキル",
+    "events": "イベント",
+    "kvk": "KVK",
+    "guides": "ガイド",
+    "teamBuilder": "チームビルダー"
+  },
+  "pages": {
+    "home": {
+      "title": "バイキングライズコンペンディウム",
+      "subtitle": "バイキングライズのヒーロー、スキル、戦略の完全ガイド",
+      "heroesSection": "ヒーロー",
+      "skillsSection": "スキル",
+      "f2pSection": "F2Pロードガイド",
+      "eventsSection": "イベント",
+      "kvkSection": "キングダムvsキングダム"
+    },
+    "heroes": {
+      "title": "ヒーローデータベース",
+      "subtitle": "バイキングライズの{count}人のヒーロー完全コレクション",
+      "searchPlaceholder": "ヒーローを検索...",
+      "classFilter": "クラス",
+      "seasonFilter": "シーズン",
+      "sourceFilter": "ソース",
+      "noResults": "検索条件に一致するヒーローが見つかりません"
+    },
+    "skills": {
+      "title": "スキルデータベース",
+      "subtitle": "バイキングライズの{count}個のスキル完全コレクション",
+      "searchPlaceholder": "スキルを検索...",
+      "typeFilter": "タイプ",
+      "noResults": "検索条件に一致するスキルが見つかりません"
+    },
+    "events": {
+      "title": "イベント",
+      "subtitle": "バイキングライズの現在および今後のイベント"
+    },
+    "kvk": {
+      "title": "キングダムvsキングダム",
+      "subtitle": "王国間の究極の戦い"
+    },
+    "guides": {
+      "title": "プレイヤーガイド",
+      "subtitle": "戦略 • ヒント • 効率性ガイド",
+      "f2pGuide": "F2Pロードガイド",
+      "gatheringGuide": "資源収集ガイド"
+    },
+    "teamBuilder": {
+      "title": "チームビルダー",
+      "subtitle": "完璧なヒーローチームを作成・カスタマイズ",
+      "mainCommander": "メインコマンダー",
+      "secondaryCommander": "サブコマンダー",
+      "createNewTeam": "新しいチームを作成"
+    }
+  },
+  "hero": {
+    "classes": {
+      "Infantry": "歩兵",
+      "Pikeman": "槍兵", 
+      "Archer": "弓兵",
+      "Porter": "ポーター",
+      "Polymath": "ポリマス"
+    },
+    "seasons": {
+      "Base Game": "ベースゲーム",
+      "Season 1": "シーズン1",
+      "Season 2": "シーズン2", 
+      "Season 3": "シーズン3",
+      "Sx": "シーズンX",
+      "Valhalla Collaboration": "ヴァルハラコラボレーション"
+    },
+    "sources": {
+      "Base Game": "ベースゲーム",
+      "KVK Event": "KVKイベント",
+      "Lucky Wheel": "ラッキーホイール",
+      "Season Pass": "シーズンパス",
+      "Special Event": "スペシャルイベント",
+      "Gacha": "ガチャ",
+      "Valhalla Collaboration": "ヴァルハラコラボレーション"
+    }
+  },
+  "skill": {
+    "types": {
+      "Cooperation": "協力",
+      "Command": "指揮",
+      "Passive": "パッシブ",
+      "Active": "アクティブ",
+      "Counterattack": "カウンターアタック",
+      "N/A": "N/A"
+    }
+  },
+  "common": {
+    "loading": "読み込み中...",
+    "error": "エラー",
+    "notFound": "見つかりません",
+    "search": "検索",
+    "filter": "フィルター",
+    "all": "すべて",
+    "close": "閉じる",
+    "share": "共有",
+    "copy": "コピー",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "confirm": "確認"
+  }
+}

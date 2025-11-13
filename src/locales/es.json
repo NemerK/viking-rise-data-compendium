@@ -1,0 +1,112 @@
+{
+  "navigation": {
+    "backToHome": "Volver al inicio",
+    "backToHeroes": "Volver a héroes",
+    "backToSkills": "Volver a habilidades",
+    "backToGuides": "Volver a guías",
+    "heroes": "Héroes",
+    "skills": "Habilidades",
+    "events": "Eventos",
+    "kvk": "KVK",
+    "guides": "Guías",
+    "teamBuilder": "Constructor de equipos"
+  },
+  "pages": {
+    "home": {
+      "title": "Compendio Viking Rise",
+      "subtitle": "Tu guía completa de héroes, habilidades y estrategias de Viking Rise",
+      "heroesSection": "Héroes",
+      "skillsSection": "Habilidades",
+      "f2pSection": "Guía F2P",
+      "eventsSection": "Eventos",
+      "kvkSection": "Reino vs Reino"
+    },
+    "heroes": {
+      "title": "Base de datos de héroes",
+      "subtitle": "Colección completa de {count} héroes en Viking Rise",
+      "searchPlaceholder": "Buscar héroes...",
+      "classFilter": "Clase",
+      "seasonFilter": "Temporada",
+      "sourceFilter": "Fuente",
+      "noResults": "No se encontraron héroes que coincidan con tus criterios"
+    },
+    "skills": {
+      "title": "Base de datos de habilidades",
+      "subtitle": "Colección completa de {count} habilidades en Viking Rise",
+      "searchPlaceholder": "Buscar habilidades...",
+      "typeFilter": "Tipo",
+      "noResults": "No se encontraron habilidades que coincidan con tus criterios"
+    },
+    "events": {
+      "title": "Eventos",
+      "subtitle": "Eventos actuales y próximos en Viking Rise"
+    },
+    "kvk": {
+      "title": "Reino vs Reino",
+      "subtitle": "La batalla definitiva entre reinos"
+    },
+    "guides": {
+      "title": "Guías de jugadores",
+      "subtitle": "Estrategias • Consejos • Guías de eficiencia",
+      "f2pGuide": "Guía F2P",
+      "gatheringGuide": "Guía de recolección"
+    },
+    "teamBuilder": {
+      "title": "Constructor de equipos",
+      "subtitle": "Crea y personaliza tus equipos de héroes perfectos",
+      "mainCommander": "Comandante principal",
+      "secondaryCommander": "Comandante secundario",
+      "createNewTeam": "Crear nuevo equipo"
+    }
+  },
+  "hero": {
+    "classes": {
+      "Infantry": "Infantería",
+      "Pikeman": "Piquero", 
+      "Archer": "Arquero",
+      "Porter": "Portador",
+      "Polymath": "Polímata"
+    },
+    "seasons": {
+      "Base Game": "Juego base",
+      "Season 1": "Temporada 1",
+      "Season 2": "Temporada 2", 
+      "Season 3": "Temporada 3",
+      "Sx": "Temporada X",
+      "Valhalla Collaboration": "Colaboración Valhalla"
+    },
+    "sources": {
+      "Base Game": "Juego base",
+      "KVK Event": "Evento KVK",
+      "Lucky Wheel": "Rueda de la suerte",
+      "Season Pass": "Pase de temporada",
+      "Special Event": "Evento especial",
+      "Gacha": "Gacha",
+      "Valhalla Collaboration": "Colaboración Valhalla"
+    }
+  },
+  "skill": {
+    "types": {
+      "Cooperation": "Cooperación",
+      "Command": "Comando",
+      "Passive": "Pasivo",
+      "Active": "Activo",
+      "Counterattack": "Contraataque",
+      "N/A": "N/A"
+    }
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "notFound": "No encontrado",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "all": "Todos",
+    "close": "Cerrar",
+    "share": "Compartir",
+    "copy": "Copiar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar"
+  }
+}

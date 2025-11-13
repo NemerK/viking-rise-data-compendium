@@ -1,0 +1,40 @@
+{
+  "navigation": {
+    "heroes": "Anh Hùng",
+    "skills": "Kỹ Năng",
+    "teamBuilder": "Xây Dựng Đội",
+    "guides": "Hướng Dẫn",
+    "events": "Sự Kiện",
+    "kvk": "KVK"
+  },
+  "heroes": {
+    "title": "Anh Hùng",
+    "subtitle": "Bộ sưu tập đầy đủ 42 anh hùng trong Viking Rise",
+    "searchPlaceholder": "Nhập tên anh hùng...",
+    "filterClass": "Lớp Anh Hùng",
+    "filterSeason": "Mùa",
+    "filterSource": "Nguồn",
+    "all": "Tất Cả"
+  },
+  "skills": {
+    "title": "Kỹ Năng",
+    "subtitle": "Bộ sưu tập đầy đủ 41 kỹ năng trong Viking Rise",
+    "searchPlaceholder": "Nhập tên kỹ năng...",
+    "filterType": "Loại Kỹ Năng",
+    "all": "Tất Cả"
+  },
+  "pages": {
+    "home": {
+      "title": "Viking Rise Compendium",
+      "subtitle": "Anh Hùng • Kỹ Năng • Chiến Lược • Hướng Dẫn"
+    },
+    "heroes": {
+      "title": "Cơ Sở Dữ Liệu Anh Hùng",
+      "subtitle": "Bộ sưu tập đầy đủ 42 anh hùng trong Viking Rise"
+    },
+    "skills": {
+      "title": "Cơ Sở Dữ Liệu Kỹ Năng",
+      "subtitle": "Bộ sưu tập đầy đủ 41 kỹ năng trong Viking Rise"
+    }
+  }
+}

@@ -1,0 +1,171 @@
+{
+  "navigation": {
+    "backToHome": "Back to Home",
+    "backToHeroes": "Back to Heroes",
+    "backToSkills": "Back to Skills",
+    "backToGuides": "Back to Guides",
+    "heroes": "Heroes",
+    "skills": "Skills",
+    "events": "Events",
+    "kvk": "KVK",
+    "guides": "Guides",
+    "teamBuilder": "Team Builder"
+  },
+  "pages": {
+    "home": {
+      "title": "Viking Rise Compendium",
+      "subtitle": "Your complete guide to Viking Rise heroes, skills, and strategies",
+      "heroesSection": "Heroes",
+      "skillsSection": "Skills",
+      "f2pSection": "F2P Road Guide",
+      "eventsSection": "Events",
+      "kvkSection": "Kingdom vs Kingdom"
+    },
+    "heroes": {
+      "title": "Heroes Database",
+      "subtitle": "Complete collection of {count} heroes in Viking Rise",
+      "searchPlaceholder": "Search heroes...",
+      "classFilter": "Class",
+      "seasonFilter": "Season",
+      "sourceFilter": "Source",
+      "noResults": "No heroes found matching your criteria"
+    },
+    "skills": {
+      "title": "Skills Database",
+      "subtitle": "Complete collection of {count} skills in Viking Rise",
+      "searchPlaceholder": "Search skills...",
+      "typeFilter": "Type",
+      "noResults": "No skills found matching your criteria"
+    },
+    "events": {
+      "title": "Events",
+      "subtitle": "Current and upcoming events in Viking Rise"
+    },
+    "kvk": {
+      "title": "Kingdom vs Kingdom",
+      "subtitle": "The ultimate battle between kingdoms"
+    },
+    "guides": {
+      "title": "Player Guides",
+      "subtitle": "Strategies • Tips • Efficiency Guides",
+      "f2pGuide": "F2P Road Guide",
+      "gatheringGuide": "Gathering Guide"
+    },
+    "teamBuilder": {
+      "title": "Team Builder",
+      "subtitle": "Create and customize your perfect hero teams",
+      "mainCommander": "Main Commander",
+      "secondaryCommander": "Secondary Commander",
+      "createNewTeam": "Create New Team"
+    }
+  },
+  "hero": {
+    "classes": {
+      "Infantry": "Infantry",
+      "Pikeman": "Pikeman", 
+      "Archer": "Archer",
+      "Porter": "Porter",
+      "Polymath": "Polymath"
+    },
+    "seasons": {
+      "Base Game": "Base Game",
+      "Season 1": "Season 1",
+      "Season 2": "Season 2", 
+      "Season 3": "Season 3",
+      "Sx": "Sx",
+      "Valhalla Collaboration": "Valhalla Collaboration"
+    },
+    "sources": {
+      "Base Game": "Base Game",
+      "KVK Event": "KVK Event",
+      "Lucky Wheel": "Lucky Wheel",
+      "Season Pass": "Season Pass",
+      "Special Event": "Special Event",
+      "Gacha": "Gacha",
+      "Valhalla Collaboration": "Valhalla Collaboration"
+    }
+  },
+  "skill": {
+    "types": {
+      "Cooperation": "Cooperation",
+      "Command": "Command",
+      "Passive": "Passive",
+      "Active": "Active",
+      "Counterattack": "Counterattack",
+      "N/A": "N/A"
+    }
+  },
+  "heroes": {
+    "Bjorn": {
+      "name": "Bjorn",
+      "description": "A mighty warrior from the north, known for his strength and courage in battle."
+    },
+    "Lagertha": {
+      "name": "Lagertha", 
+      "description": "A legendary shieldmaiden and skilled warrior, respected by all who fight alongside her."
+    },
+    "Harald": {
+      "name": "Harald",
+      "description": "A fierce warrior with unmatched combat skills and tactical brilliance."
+    },
+    "Olena": {
+      "name": "Olena",
+      "description": "A master archer with deadly precision and unmatched accuracy in battle."
+    },
+    "Artur": {
+      "name": "Artur",
+      "description": "A skilled archer who commands the battlefield with his expert marksmanship."
+    },
+    "Verdandi": {
+      "name": "Verdandi",
+      "description": "A mystical archer with divine powers and supernatural abilities."
+    },
+    "Gregory": {
+      "name": "Gregory",
+      "description": "A stalwart infantry commander known for his defensive tactics and leadership."
+    },
+    "Yvette": {
+      "name": "Yvette",
+      "description": "A skilled pikeman warrior with exceptional combat abilities and strategic mind."
+    }
+  },
+  "skills": {
+    "First Strike": {
+      "name": "First Strike",
+      "description": "Deals massive damage to the enemy with the first attack, often determining the outcome of battle."
+    },
+    "Enrage": {
+      "name": "Enrage", 
+      "description": "Increases attack power and rage generation, making the warrior more deadly in combat."
+    },
+    "Divine Blessing": {
+      "name": "Divine Blessing",
+      "description": "Provides healing and cleansing effects, protecting allies from harm."
+    },
+    "Odins Asylum": {
+      "name": "Odin's Asylum",
+      "description": "Grants immunity to control effects, allowing warriors to fight without interruption."
+    },
+    "Counter Strike": {
+      "name": "Counter Strike",
+      "description": "Retaliates against enemy attacks with devastating counterattacks."
+    },
+    "Shield Wall": {
+      "name": "Shield Wall",
+      "description": "Creates a protective barrier that absorbs incoming damage."
+    }
+  },
+    "loading": "Loading...",
+    "error": "Error",
+    "notFound": "Not Found",
+    "search": "Search",
+    "filter": "Filter",
+    "all": "All",
+    "close": "Close",
+    "share": "Share",
+    "copy": "Copy",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm"
+  }
+}
