@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export function useAITranslation(text: string) {
-  const { currentLanguage, detectedLanguage } = useLanguage();
+  const { currentLanguage } = useLanguage();
   const [translatedText, setTranslatedText] = useState(text);
   const [isTranslating, setIsTranslating] = useState(false);
 
@@ -169,7 +169,7 @@ export function useAITranslation(text: string) {
   }, []);
 
   useEffect(() => {
-    const targetLang = currentLanguage === 'auto' ? detectedLanguage : currentLanguage;
+    const targetLang = currentLanguage;
     
     if (targetLang === 'en' || targetLang === 'auto') {
       setTranslatedText(text);
@@ -177,7 +177,7 @@ export function useAITranslation(text: string) {
     }
 
     translateText(text, targetLang).then(setTranslatedText);
-  }, [text, currentLanguage, detectedLanguage, translateText]);
+  }, [text, currentLanguage, translateText]);
 
   return {
     translatedText,

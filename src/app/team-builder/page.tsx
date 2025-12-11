@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { heroes } from '@/data/heroes';
 import { skills } from '@/data/skills';
 import { Hero, Skill, Mount, HeroClass, SkillType } from '@/types';
-import html2canvas from 'html2canvas';
 
 // Helper function to get diamond-shaped skill images for team composition
 function getDiamondSkillIcon(skillName: string): string {
@@ -280,6 +279,9 @@ export default function TeamBuilderPage() {
       if (!teamRef.current) {
         throw new Error('Team element not found');
       }
+      
+      // Dynamically import html2canvas (browser-only library)
+      const html2canvas = (await import('html2canvas')).default;
       
       // Take screenshot of the team composition
       const canvas = await html2canvas(teamRef.current, {
