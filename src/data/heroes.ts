@@ -1,0 +1,80 @@
+export const heroes = [
+  {
+    id: 1,
+    name: "Gregory",
+    herotype: "Infantry",
+    heroclass: "Basic attacker",
+    portrait: "/images/heroes/Gregory.png",
+    burn: false, bleed: true, poison: false, retribution: false, slow: true,
+    counterattack: false, basicattack: true, shield: false, heal: true,
+    rage: false, silence: false, disarm: false, brokenblade: false,
+    evasion: false, dispel: false, buff: true, debuff: false,
+    directdamage: true, immunitycontrol: false, purify: false,
+    devastation: false, damagereduction: false, lacerate: false
+  },
+  {
+    id: 2,
+    name: "Harald",
+    herotype: "Infantry",
+    heroclass: "Basic attacker",
+    portrait: "/images/heroes/Harald.png",
+    burn: false, bleed: false, poison: false, retribution: false, slow: true,
+    counterattack: false, basicattack: true, shield: false, heal: false,
+    rage: false, silence: false, disarm: false, brokenblade: false,
+    evasion: false, dispel: false, buff: true, debuff: false,
+    directdamage: true, immunitycontrol: false, purify: false,
+    devastation: false, damagereduction: false, lacerate: false
+  },
+  {
+    id: 6,
+    name: "Bjorn",
+    herotype: "Infantry",
+    heroclass: "Basic attacker",
+    portrait: "/images/heroes/Bjorn.png",
+    burn: false, bleed: true, poison: false, retribution: false, slow: true,
+    counterattack: false, basicattack: true, shield: false, heal: false,
+    rage: false, silence: false, disarm: false, brokenblade: false,
+    evasion: false, dispel: false, buff: true, debuff: false,
+    directdamage: true, immunitycontrol: false, purify: false,
+    devastation: false, damagereduction: false, lacerate: false
+  },
+  {
+    id: 12,
+    name: "Rosky",
+    herotype: "Pikeman",
+    heroclass: "Skills",
+    portrait: "/images/heroes/Rosky.png",
+    burn: false, bleed: false, poison: false, retribution: false, slow: false,
+    counterattack: true, basicattack: false, shield: true, heal: true,
+    rage: false, silence: false, disarm: false, brokenblade: false,
+    evasion: false, dispel: false, buff: true, debuff: true,
+    directdamage: true, immunitycontrol: false, purify: false,
+    devastation: false, damagereduction: false, lacerate: false
+  },
+  {
+    id: 21,
+    name: "Verdandi",
+    herotype: "Archers",
+    heroclass: "Skills",
+    portrait: "/images/heroes/Verdandi.png",
+    burn: true, bleed: false, poison: false, retribution: false, slow: false,
+    counterattack: false, basicattack: true, shield: false, heal: false,
+    rage: true, silence: false, disarm: false, brokenblade: false,
+    evasion: false, dispel: false, buff: true, debuff: false,
+    directdamage: true, immunitycontrol: false, purify: false,
+    devastation: false, damagereduction: false, lacerate: false
+  },
+  {
+    id: 29,
+    name: "Ragnar",
+    herotype: "Leader",
+    heroclass: "Support",
+    portrait: "/images/heroes/Ragnar.png",
+    burn: false, bleed: false, poison: false, retribution: false, slow: false,
+    counterattack: false, basicattack: false, shield: false, heal: true,
+    rage: false, silence: false, disarm: false, brokenblade: false,
+    evasion: false, dispel: false, buff: true, debuff: true,
+    directdamage: true, immunitycontrol: false, purify: false,
+    devastation: false, damagereduction: false, lacerate: false
+  }
+];
