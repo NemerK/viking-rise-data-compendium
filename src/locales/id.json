@@ -1,0 +1,40 @@
+{
+  "navigation": {
+    "heroes": "Pahlawan",
+    "skills": "Kemampuan",
+    "teamBuilder": "Pembuat Tim",
+    "guides": "Panduan",
+    "events": "Acara",
+    "kvk": "KVK"
+  },
+  "heroes": {
+    "title": "Pahlawan",
+    "subtitle": "Koleksi lengkap 42 pahlawan di Viking Rise",
+    "searchPlaceholder": "Ketik nama pahlawan...",
+    "filterClass": "Kelas Pahlawan",
+    "filterSeason": "Musim",
+    "filterSource": "Sumber",
+    "all": "Semua"
+  },
+  "skills": {
+    "title": "Kemampuan",
+    "subtitle": "Koleksi lengkap 41 kemampuan di Viking Rise",
+    "searchPlaceholder": "Ketik nama kemampuan...",
+    "filterType": "Jenis Kemampuan",
+    "all": "Semua"
+  },
+  "pages": {
+    "home": {
+      "title": "Viking Rise Compendium",
+      "subtitle": "Pahlawan • Kemampuan • Strategi • Panduan"
+    },
+    "heroes": {
+      "title": "Basis Data Pahlawan",
+      "subtitle": "Koleksi lengkap 42 pahlawan di Viking Rise"
+    },
+    "skills": {
+      "title": "Basis Data Kemampuan",
+      "subtitle": "Koleksi lengkap 41 kemampuan di Viking Rise"
+    }
+  }
+}
