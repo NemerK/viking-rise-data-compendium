@@ -1,6 +1,11 @@
 {
   "buildCommand": "next build --no-lint",
   "framework": "nextjs",
-  "installCommand": "npm install"
+  "installCommand": "npm install",
+  "git": {
+    "deploymentEnabled": {
+      "main": true
+    }
+  }
 }
 
