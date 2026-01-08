@@ -13,8 +13,7 @@
   "dependencies": {
     "@google-cloud/translate": "^9.2.1",
     "html2canvas": "^1.4.1",
-    "next": "15.5.5",
-    "next-intl": "^4.3.12",
+    "next": "^16.1.1",
     "react": "19.1.0",
     "react-dom": "19.1.0"
   },
