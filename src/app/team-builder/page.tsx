@@ -158,7 +158,7 @@ export default function TeamBuilderPage() {
         {/* Header */}
         <div className="text-center mb-6">
           <h1 className="text-3xl font-bold text-white mb-1">Team Builder</h1>
-          <p className="text-sm text-slate-400">Drag and drop heroes & skills to build your team</p>
+          <p className="text-sm text-slate-400">Drag and drop heroes and skills to build your team</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
