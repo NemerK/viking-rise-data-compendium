@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, DragEvent } from 'react';
 import Image from 'next/image';
 import { heroes } from '@/data/heroes';
 import { skills } from '@/data/skills';
@@ -17,409 +17,361 @@ interface Team {
   members: TeamMember[];
 }
 
+type DragData = 
+  | { type: 'hero'; hero: Hero; source?: { teamId: number; memberIndex: number } }
+  | { type: 'skill'; skill: Skill; source?: { teamId: number; memberIndex: number; slot: 1 | 2 } };
+
 export default function TeamBuilderPage() {
-  // Teams state
   const [teams, setTeams] = useState<Team[]>([
-    {
-      id: 1,
-      members: [
-        { hero: null, skill1: null, skill2: null },
-        { hero: null, skill1: null, skill2: null },
-      ],
-    },
+    { id: 1, members: [{ hero: null, skill1: null, skill2: null }, { hero: null, skill1: null, skill2: null }] },
   ]);
   
-  // UI state
   const [activeTeamId, setActiveTeamId] = useState(1);
-  const [selectionMode, setSelectionMode] = useState<'hero' | 'skill' | null>(null);
-  const [selectionTarget, setSelectionTarget] = useState<{ memberIndex: number; skillSlot?: 1 | 2 } | null>(null);
-  const [heroSearch, setHeroSearch] = useState('');
-  const [skillSearch, setSkillSearch] = useState('');
+  const [activePanel, setActivePanel] = useState<'heroes' | 'skills'>('heroes');
+  const [search, setSearch] = useState('');
+  const [dragOver, setDragOver] = useState<string | null>(null);
+  const [typeFilter, setTypeFilter] = useState('All');
 
-  // Get active team
   const activeTeam = teams.find(t => t.id === activeTeamId)!;
+  const heroTypes = ['All', ...new Set(heroes.map(h => h.herotype))];
+  const skillTypes = ['All', ...new Set(skills.map(s => s.type).filter(t => t !== 'N/A'))];
 
-  // Filter heroes
   const filteredHeroes = useMemo(() => {
-    return heroes.filter(h => h.name.toLowerCase().includes(heroSearch.toLowerCase()));
-  }, [heroSearch]);
+    return heroes.filter(h => {
+      const matchesSearch = h.name.toLowerCase().includes(search.toLowerCase());
+      const matchesType = typeFilter === 'All' || h.herotype === typeFilter;
+      return matchesSearch && matchesType;
+    });
+  }, [search, typeFilter]);
 
-  // Filter skills
   const filteredSkills = useMemo(() => {
-    return skills.filter(s => s.name.toLowerCase().includes(skillSearch.toLowerCase()));
-  }, [skillSearch]);
+    return skills.filter(s => {
+      const matchesSearch = s.name.toLowerCase().includes(search.toLowerCase());
+      const matchesType = typeFilter === 'All' || s.type === typeFilter;
+      return matchesSearch && matchesType;
+    });
+  }, [search, typeFilter]);
 
-  // Open hero selection
-  const openHeroSelection = (memberIndex: number) => {
-    setSelectionMode('hero');
-    setSelectionTarget({ memberIndex });
-    setHeroSearch('');
+  const handleDragStart = (e: DragEvent, data: DragData) => {
+    const jsonData = JSON.stringify(data);
+    e.dataTransfer.setData('text/plain', jsonData);
+    e.dataTransfer.setData('application/json', jsonData);
+    e.dataTransfer.effectAllowed = 'move';
   };
 
-  // Open skill selection
-  const openSkillSelection = (memberIndex: number, skillSlot: 1 | 2) => {
-    setSelectionMode('skill');
-    setSelectionTarget({ memberIndex, skillSlot });
-    setSkillSearch('');
+  const handleDragOver = (e: DragEvent, dropId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragOver(dropId);
   };
 
-  // Select hero
-  const selectHero = (hero: typeof heroes[0]) => {
-    if (!selectionTarget) return;
+  const handleDragLeave = () => setDragOver(null);
+
+  const getDragData = (e: DragEvent): DragData | null => {
+    try {
+      let jsonString = e.dataTransfer.getData('application/json') || e.dataTransfer.getData('text/plain');
+      return jsonString ? JSON.parse(jsonString) : null;
+    } catch { return null; }
+  };
+
+  const handleHeroDrop = (e: DragEvent, memberIndex: number) => {
+    e.preventDefault();
+    setDragOver(null);
+    const data = getDragData(e);
+    if (!data || data.type !== 'hero') return;
+    
+    if (data.source) {
+      setTeams(prev => prev.map(team => {
+        if (team.id === data.source!.teamId) {
+          const newMembers = [...team.members];
+          newMembers[data.source!.memberIndex] = { hero: null, skill1: null, skill2: null };
+          return { ...team, members: newMembers };
+        }
+        return team;
+      }));
+    }
     
     setTeams(prev => prev.map(team => {
       if (team.id !== activeTeamId) return team;
-      
       const newMembers = [...team.members];
-      newMembers[selectionTarget.memberIndex] = {
-        ...newMembers[selectionTarget.memberIndex],
-        hero: hero as Hero,
-      };
-      
-      return { ...team, members: newMembers };
-    }));
-    
-    setSelectionMode(null);
-    setSelectionTarget(null);
-  };
-
-  // Select skill
-  const selectSkill = (skill: typeof skills[0]) => {
-    if (!selectionTarget || !selectionTarget.skillSlot) return;
-    
-    setTeams(prev => prev.map(team => {
-      if (team.id !== activeTeamId) return team;
-      
-      const newMembers = [...team.members];
-      const skillKey = selectionTarget.skillSlot === 1 ? 'skill1' : 'skill2';
-      newMembers[selectionTarget.memberIndex] = {
-        ...newMembers[selectionTarget.memberIndex],
-        [skillKey]: skill as unknown as Skill,
-      };
-      
-      return { ...team, members: newMembers };
-    }));
-    
-    setSelectionMode(null);
-    setSelectionTarget(null);
-  };
-
-  // Remove hero
-  const removeHero = (memberIndex: number) => {
-    setTeams(prev => prev.map(team => {
-      if (team.id !== activeTeamId) return team;
-      
-      const newMembers = [...team.members];
-      newMembers[memberIndex] = { hero: null, skill1: null, skill2: null };
-      
+      newMembers[memberIndex] = { ...newMembers[memberIndex], hero: data.hero };
       return { ...team, members: newMembers };
     }));
   };
 
-  // Remove skill
-  const removeSkill = (memberIndex: number, skillSlot: 1 | 2) => {
+  const handleSkillDrop = (e: DragEvent, memberIndex: number, slot: 1 | 2) => {
+    e.preventDefault();
+    setDragOver(null);
+    const data = getDragData(e);
+    if (!data || data.type !== 'skill') return;
+    
+    if (data.source) {
+      setTeams(prev => prev.map(team => {
+        if (team.id === data.source!.teamId) {
+          const newMembers = [...team.members];
+          newMembers[data.source!.memberIndex] = { ...newMembers[data.source!.memberIndex], [data.source!.slot === 1 ? 'skill1' : 'skill2']: null };
+          return { ...team, members: newMembers };
+        }
+        return team;
+      }));
+    }
+    
     setTeams(prev => prev.map(team => {
       if (team.id !== activeTeamId) return team;
-      
       const newMembers = [...team.members];
-      const skillKey = skillSlot === 1 ? 'skill1' : 'skill2';
-      newMembers[memberIndex] = {
-        ...newMembers[memberIndex],
-        [skillKey]: null,
-      };
-      
+      newMembers[memberIndex] = { ...newMembers[memberIndex], [slot === 1 ? 'skill1' : 'skill2']: data.skill };
       return { ...team, members: newMembers };
     }));
   };
 
-  // Add new team
+  const removeHero = (i: number) => {
+    setTeams(prev => prev.map(team => {
+      if (team.id !== activeTeamId) return team;
+      const m = [...team.members]; m[i] = { hero: null, skill1: null, skill2: null };
+      return { ...team, members: m };
+    }));
+  };
+
+  const removeSkill = (i: number, slot: 1 | 2) => {
+    setTeams(prev => prev.map(team => {
+      if (team.id !== activeTeamId) return team;
+      const m = [...team.members]; m[i] = { ...m[i], [slot === 1 ? 'skill1' : 'skill2']: null };
+      return { ...team, members: m };
+    }));
+  };
+
   const addTeam = () => {
     const newId = Math.max(...teams.map(t => t.id)) + 1;
-    setTeams(prev => [
-      ...prev,
-      {
-        id: newId,
-        members: [
-          { hero: null, skill1: null, skill2: null },
-          { hero: null, skill1: null, skill2: null },
-        ],
-      },
-    ]);
+    setTeams(prev => [...prev, { id: newId, members: [{ hero: null, skill1: null, skill2: null }, { hero: null, skill1: null, skill2: null }] }]);
     setActiveTeamId(newId);
   };
 
-  // Delete team
-  const deleteTeam = (teamId: number) => {
+  const deleteTeam = (id: number) => {
     if (teams.length <= 1) return;
-    
-    setTeams(prev => prev.filter(t => t.id !== teamId));
-    if (activeTeamId === teamId) {
-      setActiveTeamId(teams.find(t => t.id !== teamId)?.id || 1);
-    }
+    setTeams(prev => prev.filter(t => t.id !== id));
+    if (activeTeamId === id) setActiveTeamId(teams.find(t => t.id !== id)?.id || 1);
   };
 
   return (
-    <div className="min-h-screen py-8">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-      {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-4">Team Builder</h1>
-          <p className="text-slate-400">Create and customize your hero teams</p>
-      </div>
+    <div className="min-h-screen py-6">
+      <div className="max-w-6xl mx-auto px-4">
+        {/* Header */}
+        <div className="text-center mb-6">
+          <h1 className="text-3xl font-bold text-white mb-1">Team Builder</h1>
+          <p className="text-sm text-slate-400">Drag and drop heroes & skills to build your team</p>
+        </div>
 
-        {/* Team Tabs */}
-        <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2">
-          {teams.map((team) => (
-                    <button
-              key={team.id}
-              onClick={() => setActiveTeamId(team.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all whitespace-nowrap ${
-                activeTeamId === team.id
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50'
-              }`}
-            >
-              <span>Team {team.id}</span>
-              {teams.length > 1 && (
-                <span
-                      onClick={(e) => {
-                        e.stopPropagation();
-                    deleteTeam(team.id);
-                  }}
-                  className="w-5 h-5 flex items-center justify-center rounded-full bg-slate-700/50 hover:bg-red-500/50 text-xs"
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Left - Team Composition */}
+          <div>
+            {/* Team Tabs */}
+            <div className="flex items-center gap-2 mb-4">
+              {teams.map((team) => (
+                <button
+                  key={team.id}
+                  onClick={() => setActiveTeamId(team.id)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    activeTeamId === team.id ? 'bg-amber-500 text-white' : 'bg-slate-800/60 text-slate-300 hover:bg-slate-700/60'
+                  }`}
                 >
-                  ×
-                </span>
-              )}
-            </button>
-          ))}
-          <button
-            onClick={addTeam}
-            className="px-4 py-2 rounded-lg bg-green-600/20 text-green-400 hover:bg-green-600/30 font-medium transition-all"
-          >
-            + Add Team
-                    </button>
+                  Team {team.id}
+                  {teams.length > 1 && (
+                    <span onClick={(e) => { e.stopPropagation(); deleteTeam(team.id); }} className="ml-1 hover:text-red-400">×</span>
+                  )}
+                </button>
+              ))}
+              <button onClick={addTeam} className="px-3 py-2 rounded-lg bg-slate-800/60 text-green-400 hover:bg-slate-700/60 text-sm">+ New</button>
+            </div>
+
+            {/* Team Cards */}
+            <div className="space-y-4">
+              {activeTeam.members.map((member, index) => (
+                <div key={index} className="glass-card p-4">
+                  <div className="text-xs font-bold text-amber-400 mb-3 uppercase tracking-wide">
+                    {index === 0 ? '👑 Main Commander' : '⚔️ Secondary Commander'}
                   </div>
                   
-        {/* Team Composition */}
-        <div className="glass-card p-6 mb-6">
-          <h2 className="text-xl font-bold text-white mb-6">Team {activeTeamId} Composition</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {activeTeam.members.map((member, index) => (
-              <div key={index} className="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50">
-                <div className="text-sm font-medium text-slate-400 mb-3">
-                  {index === 0 ? 'Main Commander' : 'Secondary Commander'}
-                            </div>
-                            
-                <div className="flex gap-4">
-                  {/* Hero Slot */}
-                  <div className="flex-shrink-0">
-                    {member.hero ? (
-                      <div className="relative group">
-                        <div className="relative w-24 h-24 drop-shadow-[0_0_10px_rgba(255,215,0,0.5)] group-hover:drop-shadow-[0_0_15px_rgba(255,215,0,0.8)] transition-all">
-                          <Image
-                            src={member.hero.portrait}
-                            alt={member.hero.name}
-                            fill
-                            className="object-contain"
-                            sizes="96px"
-                          />
-                        </div>
-                        <div className="text-center mt-1">
-                          <span className="text-xs font-bold text-amber-400">{member.hero.name}</span>
-                        </div>
-                        <button
-                          onClick={() => removeHero(index)}
-                          className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity text-xs flex items-center justify-center"
+                  <div className="flex gap-4">
+                    {/* Hero Drop Zone */}
+                    <div
+                      onDragOver={(e) => handleDragOver(e, `hero-${index}`)}
+                      onDragLeave={handleDragLeave}
+                      onDrop={(e) => handleHeroDrop(e, index)}
+                    >
+                      {member.hero ? (
+                        <div 
+                          className="relative group cursor-grab"
+                          draggable
+                          onDragStart={(e) => handleDragStart(e, { type: 'hero', hero: member.hero!, source: { teamId: activeTeamId, memberIndex: index } })}
                         >
-                          ×
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => openHeroSelection(index)}
-                        className="w-24 h-24 rounded-xl border-2 border-dashed border-slate-600 flex items-center justify-center text-slate-500 hover:border-amber-500 hover:text-amber-400 transition-colors"
-                      >
-                        <span className="text-3xl">+</span>
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Skill Slots */}
-                  <div className="flex flex-col gap-2 flex-1">
-                    {[1, 2].map((slot) => {
-                      const skill = slot === 1 ? member.skill1 : member.skill2;
-                      return (
-                        <div key={slot} className="flex items-center gap-2">
-                          {skill ? (
-                            <div className="flex items-center gap-2 flex-1 bg-slate-700/50 rounded-lg p-2 group relative">
-                              <div className="relative w-10 h-10 flex-shrink-0">
-                                <Image
-                                  src={skill.icon}
-                                  alt={skill.name}
-                                  fill
-                                  className="object-contain rounded"
-                                  sizes="40px"
-                                />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="text-sm font-medium text-white truncate">{skill.name}</div>
-                                <div className="text-xs text-slate-400">{skill.type}</div>
-                              </div>
-                              <button
-                                onClick={() => removeSkill(index, slot as 1 | 2)}
-                                className="w-5 h-5 bg-red-500/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity text-xs flex items-center justify-center"
-                              >
-                                ×
-                              </button>
-                            </div>
-                          ) : (
-                            <button
-                              onClick={() => openSkillSelection(index, slot as 1 | 2)}
-                              className="flex-1 h-14 rounded-lg border border-dashed border-slate-600 flex items-center justify-center gap-2 text-slate-500 hover:border-blue-500 hover:text-blue-400 transition-colors"
-                            >
-                              <span>+</span>
-                              <span className="text-sm">Skill {slot}</span>
-                            </button>
-                          )}
+                          <div className={`relative w-16 h-16 drop-shadow-[0_0_10px_rgba(255,215,0,0.5)] transition-transform ${dragOver === `hero-${index}` ? 'scale-110' : ''}`}>
+                            <Image src={member.hero.portrait} alt={member.hero.name} fill className="object-contain" sizes="64px" draggable={false} />
+                          </div>
+                          <div className="text-[10px] text-center text-amber-400 font-bold mt-1">{member.hero.name}</div>
+                          <button onClick={() => removeHero(index)} className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity">×</button>
                         </div>
-                      );
-                    })}
-                  </div>
+                      ) : (
+                        <div className={`w-16 h-16 rounded-xl border-2 border-dashed flex items-center justify-center transition-all ${
+                          dragOver === `hero-${index}` ? 'border-amber-400 bg-amber-400/20 scale-110' : 'border-slate-600'
+                        }`}>
+                          <span className="text-slate-500 text-xl">+</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Skill Drop Zones */}
+                    <div className="flex-1 space-y-2">
+                      {[1, 2].map((slot) => {
+                        const skill = slot === 1 ? member.skill1 : member.skill2;
+                        const dropId = `skill-${index}-${slot}`;
+                        return (
+                          <div
+                            key={slot}
+                            onDragOver={(e) => handleDragOver(e, dropId)}
+                            onDragLeave={handleDragLeave}
+                            onDrop={(e) => handleSkillDrop(e, index, slot as 1 | 2)}
+                          >
+                            {skill ? (
+                              <div 
+                                className={`flex items-center gap-2 p-2 bg-slate-700/50 rounded-lg group cursor-grab transition-all ${dragOver === dropId ? 'ring-2 ring-blue-400' : ''}`}
+                                draggable
+                                onDragStart={(e) => handleDragStart(e, { type: 'skill', skill, source: { teamId: activeTeamId, memberIndex: index, slot: slot as 1 | 2 } })}
+                              >
+                                <div className="relative w-9 h-9 flex-shrink-0">
+                                  <Image src={skill.icon} alt={skill.name} fill className="object-contain rounded" sizes="36px" draggable={false} />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="text-sm text-white font-medium truncate">{skill.name}</div>
+                                  <div className="text-[10px] text-slate-400">{skill.type}</div>
+                                </div>
+                                <button onClick={() => removeSkill(index, slot as 1 | 2)} className="text-red-400 opacity-0 group-hover:opacity-100 transition-opacity">×</button>
+                              </div>
+                            ) : (
+                              <div className={`h-[52px] rounded-lg border border-dashed flex items-center justify-center gap-2 transition-all ${
+                                dragOver === dropId ? 'border-blue-400 bg-blue-400/20' : 'border-slate-600'
+                              }`}>
+                                <span className="text-slate-500 text-sm">+ Skill {slot}</span>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
               ))}
+
+              {/* Stats */}
+              <div className="glass-card p-4">
+                <div className="grid grid-cols-3 gap-4 text-center">
+                  <div>
+                    <div className="text-xl font-bold text-amber-400">{activeTeam.members.filter(m => m.hero).length}/2</div>
+                    <div className="text-xs text-slate-400">Heroes</div>
+                  </div>
+                  <div>
+                    <div className="text-xl font-bold text-blue-400">{activeTeam.members.filter(m => m.skill1).length + activeTeam.members.filter(m => m.skill2).length}/4</div>
+                    <div className="text-xs text-slate-400">Skills</div>
+                  </div>
+                  <div>
+                    <div className={`text-xl font-bold ${activeTeam.members.every(m => m.hero && m.skill1 && m.skill2) ? 'text-green-400' : 'text-slate-500'}`}>
+                      {activeTeam.members.every(m => m.hero && m.skill1 && m.skill2) ? '✓ Ready' : 'Incomplete'}
+                    </div>
+                    <div className="text-xs text-slate-400">Status</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-        {/* Quick Stats */}
-        <div className="glass-card p-6">
-          <h3 className="text-lg font-bold text-white mb-4">Team Summary</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-blue-400">
-                {activeTeam.members.filter(m => m.hero).length}
+          {/* Right - Selection Panel */}
+          <div>
+            <div className="glass-card p-4 sticky top-20">
+              {/* Tabs */}
+              <div className="flex gap-2 mb-4">
+                <button
+                  onClick={() => { setActivePanel('heroes'); setTypeFilter('All'); setSearch(''); }}
+                  className={`flex-1 py-2.5 rounded-lg font-medium transition-all ${
+                    activePanel === 'heroes' ? 'bg-amber-500 text-white' : 'bg-slate-800/60 text-slate-300 hover:bg-slate-700/60'
+                  }`}
+                >
+                  ⚔️ Heroes
+                </button>
+                <button
+                  onClick={() => { setActivePanel('skills'); setTypeFilter('All'); setSearch(''); }}
+                  className={`flex-1 py-2.5 rounded-lg font-medium transition-all ${
+                    activePanel === 'skills' ? 'bg-blue-500 text-white' : 'bg-slate-800/60 text-slate-300 hover:bg-slate-700/60'
+                  }`}
+                >
+                  ✨ Skills
+                </button>
               </div>
-              <div className="text-sm text-slate-400">Heroes</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-400">
-                {activeTeam.members.filter(m => m.skill1).length + activeTeam.members.filter(m => m.skill2).length}
-                  </div>
-              <div className="text-sm text-slate-400">Skills</div>
-                  </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-400">
-                {teams.length}
-                </div>
-              <div className="text-sm text-slate-400">Teams</div>
-                </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-yellow-400">
-                {activeTeam.members.filter(m => m.hero && m.skill1 && m.skill2).length === 2 ? '✓' : '○'}
-              </div>
-              <div className="text-sm text-slate-400">Complete</div>
-            </div>
-          </div>
-        </div>
-                </div>
 
-      {/* Selection Modal */}
-      {selectionMode && (
-        <div 
-          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-          onClick={() => {
-            setSelectionMode(null);
-            setSelectionTarget(null);
-          }}
-        >
-          <div 
-            className="glass-card max-w-2xl w-full max-h-[80vh] overflow-hidden flex flex-col"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Modal Header */}
-            <div className="p-4 border-b border-slate-700/50">
-              <h2 className="text-xl font-bold text-white">
-                {selectionMode === 'hero' ? 'Select Hero' : 'Select Skill'}
-              </h2>
-                  <input
-                    type="text"
-                placeholder={`Search ${selectionMode === 'hero' ? 'heroes' : 'skills'}...`}
-                value={selectionMode === 'hero' ? heroSearch : skillSearch}
-                onChange={(e) => selectionMode === 'hero' ? setHeroSearch(e.target.value) : setSkillSearch(e.target.value)}
-                className="input-dark mt-3"
-                autoFocus
-                  />
-                </div>
-
-            {/* Modal Content */}
-            <div className="flex-1 overflow-y-auto p-4">
-              {selectionMode === 'hero' ? (
-                <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-3">
-                  {filteredHeroes.map((hero) => (
-                    <button
-                      key={hero.id}
-                      onClick={() => selectHero(hero)}
-                      className="relative group text-center"
-                    >
-                      <div className="relative w-full aspect-square transition-all duration-200 hover:scale-105 group-hover:drop-shadow-[0_0_12px_rgba(255,215,0,0.8)]">
-                        <Image
-                          src={hero.portrait}
-                          alt={hero.name}
-                          fill
-                          className="object-contain"
-                          sizes="(max-width: 640px) 25vw, 16vw"
-                        />
-                      </div>
-                      <div className="mt-1">
-                        <span className="text-[10px] font-bold text-slate-300 group-hover:text-amber-400 transition-colors">{hero.name}</span>
-                      </div>
-                    </button>
+              {/* Search & Filter */}
+              <div className="flex gap-2 mb-4">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="input-dark text-sm h-10 flex-1"
+                />
+                <select
+                  value={typeFilter}
+                  onChange={(e) => setTypeFilter(e.target.value)}
+                  className="select-dark text-sm h-10 w-28"
+                >
+                  {(activePanel === 'heroes' ? heroTypes : skillTypes).map(type => (
+                    <option key={type} value={type}>{type}</option>
                   ))}
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {filteredSkills.map((skill) => (
-                          <button
-                            key={skill.id}
-                      onClick={() => selectSkill(skill)}
-                      className="flex items-center gap-3 p-3 rounded-lg bg-slate-800/50 hover:bg-slate-700/50 transition-colors text-left"
-                    >
-                      <div className="relative w-12 h-12 flex-shrink-0">
-                          <Image
-                            src={skill.icon}
-                            alt={skill.name}
-                            fill
-                          className="object-contain rounded"
-                          sizes="48px"
-                          />
+                </select>
+              </div>
+
+              {/* Items Grid */}
+              <div className="h-[420px] overflow-y-auto pr-1">
+                {activePanel === 'heroes' ? (
+                  <div className="grid grid-cols-5 gap-2">
+                    {filteredHeroes.map((hero) => (
+                      <div
+                        key={hero.id}
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, { type: 'hero', hero: hero as Hero })}
+                        className="cursor-grab group text-center"
+                      >
+                        <div className="relative aspect-square transition-transform hover:scale-110 group-hover:drop-shadow-[0_0_12px_rgba(255,215,0,0.7)]">
+                          <Image src={hero.portrait} alt={hero.name} fill className="object-contain" sizes="60px" draggable={false} />
                         </div>
-                      <div>
-                        <div className="font-medium text-white">{skill.name}</div>
-                        <div className="text-xs text-slate-400">{skill.type}</div>
+                        <span className="text-[9px] text-slate-400 group-hover:text-amber-400 font-medium block truncate">{hero.name}</span>
                       </div>
-                    </button>
-                  ))}
-                </div>
-              )}
-      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-3 gap-2">
+                    {filteredSkills.map((skill) => (
+                      <div
+                        key={skill.id}
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, { type: 'skill', skill: skill as Skill })}
+                        className="cursor-grab group p-2 bg-slate-800/40 rounded-lg hover:bg-slate-700/60 transition-colors text-center"
+                      >
+                        <div className="relative w-10 h-10 mx-auto mb-1">
+                          <Image src={skill.icon} alt={skill.name} fill className="object-contain" sizes="40px" draggable={false} />
+                        </div>
+                        <div className="text-[10px] text-white font-medium truncate">{skill.name}</div>
+                        <div className="text-[9px] text-slate-500">{skill.type}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
 
-            {/* Modal Footer */}
-            <div className="p-4 border-t border-slate-700/50">
-              <button
-                onClick={() => {
-                  setSelectionMode(null);
-                  setSelectionTarget(null);
-                }}
-                className="btn-secondary w-full"
-              >
-                Cancel
-              </button>
+              {/* Count */}
+              <div className="mt-3 pt-3 border-t border-slate-700/50 text-center text-xs text-slate-500">
+                {activePanel === 'heroes' ? filteredHeroes.length : filteredSkills.length} {activePanel} available
+              </div>
             </div>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
