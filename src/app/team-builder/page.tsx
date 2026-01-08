@@ -69,7 +69,7 @@ export default function TeamBuilderPage() {
 
   const getDragData = (e: DragEvent): DragData | null => {
     try {
-      let jsonString = e.dataTransfer.getData('application/json') || e.dataTransfer.getData('text/plain');
+      const jsonString = e.dataTransfer.getData('application/json') || e.dataTransfer.getData('text/plain');
       return jsonString ? JSON.parse(jsonString) : null;
     } catch { return null; }
   };
