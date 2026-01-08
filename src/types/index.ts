@@ -1,8 +1,9 @@
+// Hero type matching actual data structure
 export interface Hero {
   id: number;
   name: string;
-  herotype: 'Infantry' | 'Pikeman' | 'Archers' | 'Leader' | 'Archer';
-  heroclass: 'Basic attacker' | 'Counterattack' | 'Skills' | 'Support' | 'Mount';
+  herotype: string;
+  heroclass: string;
   portrait: string;
   // Combat abilities
   burn: boolean;
@@ -30,8 +31,39 @@ export interface Hero {
   lacerate?: boolean;
 }
 
-export interface FilterOptions {
-  herotype?: string;
-  heroclass?: string;
-  search?: string;
+// Skill type matching actual data structure
+export interface Skill {
+  id: number;
+  name: string;
+  type: string;
+  probability: number;
+  description: string;
+  icon: string;
+  effects: Record<string, boolean | undefined>;
+}
+
+// Team Builder types
+export interface TeamMember {
+  hero: Hero | null;
+  skill1: Skill | null;
+  skill2: Skill | null;
+}
+
+export interface Team {
+  id: number;
+  members: TeamMember[];
+}
+
+// Filter types
+export interface HeroFilters {
+  herotype: string;
+  heroclass: string;
+  search: string;
+  ability: string;
+}
+
+export interface SkillFilters {
+  type: string;
+  search: string;
+  effect: string;
 }

@@ -1,5 +1,3 @@
-import { Skill } from '../types';
-
 // Helper function to map skill names to actual image files
 function getSkillIcon(skillName: string): string {
   const imageMap: { [key: string]: string } = {
@@ -82,7 +80,7 @@ function getSkillIcon(skillName: string): string {
   return `/images/skills/diamond/${imageFile}`;
 }
 
-export const skills: Skill[] = [
+export const skills = [
   {
     id: 1,
     name: 'Furious Hack and Slash',

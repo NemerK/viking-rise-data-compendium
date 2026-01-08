@@ -1,227 +1,171 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
+import Image from 'next/image';
 import { heroes } from '@/data/heroes';
-import BackButton from '@/components/BackButton';
 
-const heroClasses = ['All', 'Infantry', 'Pikeman', 'Archer', 'Porter', 'Polymath'];
-const heroSeasons = ['All', 'Base Game', 'Season 1', 'Season 2', 'Season 3', 'Sx', 'Valhalla Collaboration'];
-const heroSources = ['All', 'Base Game', 'KVK Event', 'Lucky Wheel', 'Season Pass', 'Special Event', 'Gacha', 'Valhalla Collaboration'];
-
-// Hero Card Component
-function HeroCard({ hero }: { hero: any }) {
-
-  return (
-    <Link href={`/heroes/${hero.name.toLowerCase().replace(/\s+/g, '-')}`} className="block">
-      <div className="relative dark-card rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer group hero-glow">
-        <div className="relative w-full h-32">
-          <Image
-            src={hero.portrait}
-            alt={hero.name}
-            fill
-            className="object-contain p-1"
-            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 16vw"
-          />
-          
-          {/* Glow Effect Overlay */}
-          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <Image
-              src="/images/heroes/glow2.png"
-              alt=""
-              fill
-              className="object-contain"
-              sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 16vw"
-            />
-          </div>
-          
-          {/* Hero Class Badge */}
-          <div className={`absolute top-1 left-1 px-1 py-0.5 rounded text-white text-xs font-semibold ${
-            hero.heroClass === 'Infantry' ? 'bg-green-500' :
-            hero.heroClass === 'Pikeman' ? 'bg-blue-500' :
-            hero.heroClass === 'Archer' ? 'bg-red-500' :
-            hero.heroClass === 'Porter' ? 'bg-yellow-500' :
-            hero.heroClass === 'Polymath' ? 'bg-purple-500' :
-            'bg-gray-500'
-          }`}>
-            {hero.heroClass}
-          </div>
-          
-          {/* Season Badge */}
-          <div className="absolute top-1 right-1 px-1 py-0.5 rounded bg-black bg-opacity-70 text-white text-xs font-semibold">
-            {hero.season}
-          </div>
-        </div>
-
-        <div className="p-1 text-center">
-          <h3 className="text-xs font-bold text-white truncate">
-            {hero.name}
-          </h3>
-          <p className="text-xs text-gray-400 truncate">
-            {hero.source}
-          </p>
-        </div>
-      </div>
-    </Link>
-  );
-}
+// All abilities for filtering
+const abilityOptions = [
+  { key: 'burn', label: 'Burn', icon: '🔥' },
+  { key: 'bleed', label: 'Bleed', icon: '🩸' },
+  { key: 'poison', label: 'Poison', icon: '☠️' },
+  { key: 'slow', label: 'Slow', icon: '❄️' },
+  { key: 'heal', label: 'Heal', icon: '💚' },
+  { key: 'shield', label: 'Shield', icon: '🛡️' },
+  { key: 'silence', label: 'Silence', icon: '🔇' },
+  { key: 'rage', label: 'Rage', icon: '😡' },
+  { key: 'counterattack', label: 'Counter', icon: '⚡' },
+  { key: 'lacerate', label: 'Lacerate', icon: '🗡️' },
+  { key: 'brokenblade', label: 'Broken Blade', icon: '⚔️' },
+];
 
 export default function HeroesPage() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedClass, setSelectedClass] = useState('All');
-  const [selectedSeason, setSelectedSeason] = useState('All');
-  const [selectedSource, setSelectedSource] = useState('All');
+  const [search, setSearch] = useState('');
+  const [typeFilter, setTypeFilter] = useState('All');
+  const [classFilter, setClassFilter] = useState('All');
+  const [abilityFilter, setAbilityFilter] = useState('All');
 
-  // Auto-filtering logic
+  // Get unique types and classes
+  const heroTypes = ['All', ...new Set(heroes.map(h => h.herotype))];
+  const heroClasses = ['All', ...new Set(heroes.map(h => h.heroclass))];
+
+  // Filter heroes
   const filteredHeroes = useMemo(() => {
     return heroes.filter(hero => {
-      const matchesSearch = hero.name.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesClass = selectedClass === 'All' || hero.heroClass === selectedClass;
-      const matchesSeason = selectedSeason === 'All' || hero.season === selectedSeason;
-      const matchesSource = selectedSource === 'All' || hero.source === selectedSource;
+      const matchesSearch = hero.name.toLowerCase().includes(search.toLowerCase());
+      const matchesType = typeFilter === 'All' || hero.herotype === typeFilter;
+      const matchesClass = classFilter === 'All' || hero.heroclass === classFilter;
+      const matchesAbility = abilityFilter === 'All' || (hero as any)[abilityFilter] === true;
       
-      return matchesSearch && matchesClass && matchesSeason && matchesSource;
+      return matchesSearch && matchesType && matchesClass && matchesAbility;
     });
-  }, [searchTerm, selectedClass, selectedSeason, selectedSource]);
-
-  // Auto-complete suggestions
-  const searchSuggestions = useMemo(() => {
-    if (searchTerm.length < 2) return [];
-    return heroes
-      .filter(hero => hero.name.toLowerCase().includes(searchTerm.toLowerCase()))
-      .slice(0, 5)
-      .map(hero => hero.name);
-  }, [searchTerm]);
+  }, [search, typeFilter, classFilter, abilityFilter]);
 
   return (
-    <div className="min-h-screen">
-      {/* Header */}
-      <div className="bg-gray-900/60 backdrop-blur-md border-b border-gray-700/50 py-8 shadow-2xl">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Back Button */}
-          <div className="mb-6">
-            <BackButton href="/" text="Back to Home" />
-          </div>
-          <h1 className="text-2xl md:text-3xl font-light text-gray-200 mb-2 tracking-wide drop-shadow-lg">
-            Heroes Database
-          </h1>
-          <p className="text-sm text-gray-400 font-light drop-shadow-md">
-            Complete collection of {heroes.length} heroes in Viking Rise
-          </p>
-        </div>
-      </div>
-
-      {/* Search and Filters */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="dark-card rounded-lg shadow-md p-6 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Auto-complete Search */}
-            <div className="relative">
-              <label className="block text-sm font-medium text-gray-300 mb-2">Search Heroes</label>
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Type hero name..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full dark-input px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                {/* Auto-complete dropdown */}
-                {searchSuggestions.length > 0 && (
-                  <div className="absolute z-10 w-full mt-1 bg-gray-800 border border-gray-600 rounded-md shadow-lg">
-                    {searchSuggestions.map((suggestion, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setSearchTerm(suggestion)}
-                        className="w-full px-3 py-2 text-left text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
-                      >
-                        {suggestion}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Hero Class Filter */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Hero Class</label>
-              <select
-                value={selectedClass}
-                onChange={(e) => setSelectedClass(e.target.value)}
-                className="w-full dark-select px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                {heroClasses.map(heroClass => (
-                  <option key={heroClass} value={heroClass}>{heroClass}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Hero Season Filter */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Season</label>
-              <select
-                value={selectedSeason}
-                onChange={(e) => setSelectedSeason(e.target.value)}
-                className="w-full dark-select px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                {heroSeasons.map(season => (
-                  <option key={season} value={season}>{season}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Hero Source Filter */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Source</label>
-              <select
-                value={selectedSource}
-                onChange={(e) => setSelectedSource(e.target.value)}
-                className="w-full dark-select px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                {heroSources.map(source => (
-                  <option key={source} value={source}>{source}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
-
-        {/* Results Count */}
+    <div className="min-h-screen py-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
         <div className="mb-6">
-          <p className="text-gray-300">
+          <h1 className="text-2xl font-bold text-white mb-2">Heroes Database</h1>
+          <p className="text-sm text-slate-400">{heroes.length} heroes available</p>
+        </div>
+
+        {/* Filters - Compact */}
+        <div className="glass-card p-4 mb-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {/* Search */}
+            <div>
+              <input
+                type="text"
+                placeholder="Search..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="input-dark text-sm h-9"
+              />
+            </div>
+            
+            {/* Type Filter */}
+            <div>
+              <select
+                value={typeFilter}
+                onChange={(e) => setTypeFilter(e.target.value)}
+                className="select-dark text-sm h-9"
+              >
+                {heroTypes.map(type => (
+                  <option key={type} value={type}>{type}</option>
+                ))}
+              </select>
+            </div>
+            
+            {/* Class Filter */}
+            <div>
+              <select
+                value={classFilter}
+                onChange={(e) => setClassFilter(e.target.value)}
+                className="select-dark text-sm h-9"
+              >
+                {heroClasses.map(cls => (
+                  <option key={cls} value={cls}>{cls}</option>
+                ))}
+              </select>
+            </div>
+            
+            {/* Ability Filter */}
+            <div>
+              <select
+                value={abilityFilter}
+                onChange={(e) => setAbilityFilter(e.target.value)}
+                className="select-dark text-sm h-9"
+              >
+                <option value="All">All Abilities</option>
+                {abilityOptions.map(ability => (
+                  <option key={ability.key} value={ability.key}>{ability.icon} {ability.label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          
+          {/* Results Count */}
+          <div className="mt-3 text-xs text-slate-500">
             Showing {filteredHeroes.length} of {heroes.length} heroes
-            {searchTerm && ` matching "${searchTerm}"`}
-            {selectedClass !== 'All' && ` of class "${selectedClass}"`}
-            {selectedSeason !== 'All' && ` from "${selectedSeason}"`}
-            {selectedSource !== 'All' && ` from "${selectedSource}"`}
-          </p>
+          </div>
         </div>
 
-        {/* Heroes Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-        {filteredHeroes.map((hero) => (
-          <HeroCard key={hero.id} hero={hero} />
-        ))}
+        {/* Heroes Grid - Clean Item Style */}
+        <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12 gap-3">
+          {filteredHeroes.map((hero) => (
+            <Link
+              key={hero.id}
+              href={`/heroes/${encodeURIComponent(hero.name)}`}
+              className="group relative pb-5"
+            >
+              <div className="relative w-full aspect-square transition-all duration-300 hover:scale-110 hover:z-10 group-hover:drop-shadow-[0_0_15px_rgba(255,215,0,0.8)]">
+                <Image
+                  src={hero.portrait}
+                  alt={hero.name}
+                  fill
+                  className="object-contain"
+                  sizes="(max-width: 640px) 20vw, (max-width: 1024px) 12vw, 8vw"
+                />
+              </div>
+              
+              {/* Name below portrait */}
+              <div className="absolute -bottom-0 left-0 right-0 text-center">
+                <span className="text-[10px] font-bold text-slate-300 group-hover:text-amber-400 transition-colors">{hero.name}</span>
+              </div>
+            </Link>
+          ))}
         </div>
 
+        {/* No Results */}
         {filteredHeroes.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-gray-400 text-lg">No heroes found matching your criteria.</p>
-            <button 
-              onClick={() => {
-                setSearchTerm('');
-                setSelectedClass('All');
-                setSelectedSeason('All');
-                setSelectedSource('All');
-              }}
-              className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-            >
-              Clear Filters
-            </button>
+            <div className="text-4xl mb-3">🔍</div>
+            <h3 className="text-lg font-semibold text-white mb-1">No heroes found</h3>
+            <p className="text-sm text-slate-400">Try adjusting your filters</p>
           </div>
         )}
+
+        {/* Legend */}
+        <div className="mt-8 flex flex-wrap justify-center gap-4 text-xs">
+          <div className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 rounded-full bg-green-500"></div>
+            <span className="text-slate-400">Infantry</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 rounded-full bg-blue-500"></div>
+            <span className="text-slate-400">Pikeman</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+            <span className="text-slate-400">Archers</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 rounded-full bg-purple-500"></div>
+            <span className="text-slate-400">Leader</span>
+          </div>
+        </div>
       </div>
     </div>
   );

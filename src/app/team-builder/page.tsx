@@ -1,959 +1,420 @@
 'use client';
 
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { heroes } from '@/data/heroes';
 import { skills } from '@/data/skills';
-import { Hero, Skill, Mount, HeroClass, SkillType } from '@/types';
-
-// Helper function to get diamond-shaped skill images for team composition
-function getDiamondSkillIcon(skillName: string): string {
-  const diamondImageMap: { [key: string]: string } = {
-    'Furious Hack and Slash': 'Furious-Hack-and-Slash-small.png',
-    'Poison Arrow': 'Poison-Arrow-small.png',
-    'Shield Wall': 'Shield-Support-small.png',
-    'Healing Light': 'Blessed-Healing-small.png',
-    'Battle Cry': 'Battle-Hymn-small.png',
-    'Counter Strike': 'Counterstrike-small.png',
-    'Divine Protection': 'Divine-Shield-small.png',
-    'Divine Shield': 'Divine-Shield-small.png',
-    'Silence': 'Silencer-small.png',
-    'Silent Assassin': 'Silent-Invasion-small.png',
-    'Rapid Fire': 'Rapid-Attack-small.png',
-    'Blood Rage': 'Bloody-Rage-small.png',
-    'Divine Blessing': 'Divine-Blessing-small.png',
-    'Fearless Charge': 'Fearless-small.png',
-    'Enchanted Pursuit': 'Enchanted-Pursuit-small.png',
-    'Rest and Counterattack': 'Rest-and-Counterattack-small.png',
-    'Retaliate': 'Retaliate-small.png',
-    'Siege': 'Siege-small.png',
-    'Silent Invasion': 'Silent-Invasion-small.png',
-    'Solitude': 'Solitude-small.png',
-    'Splinter': 'Splinter-small.png',
-    'Tenacity': 'Tenacity-small.png',
-    'This Too Shall Pass': 'This-Too-Shall-Pass-small.png',
-    'Thors Determination': 'Thors-Determination-small.png',
-    'Tidal Attack': 'Tidal-Attack-small.png',
-    'Trap of Despair': 'Trap-of-Despair-small.png',
-    'Valkyries Gaze': 'Valkyries-Gaze-small.png',
-    'Venom Aggregation': 'Venom-Agrregation-small.png',
-    'Wild Indulgence': 'Wild-Indulgence-small.png',
-    'First Strike': 'First-Strike-small.png',
-    'Enrage': 'Enrage-small.png',
-    'Odins Asylum': 'Odins-Asylum-small.png',
-    'Rage Leech': 'Rage-Leech-small.png',
-    'Hymn of Life': 'Hymn-of-Life-small.png',
-    'Deadly Counterattack': 'Deadly-Counterattack-small.png',
-    'Devastating Charge': 'Devastating-Charge-small.png',
-    'Disarmament': 'Disarmament-small.png',
-    'On Alert': 'On-Alert-small.png',
-    'Blessed Negation': 'Blessed-Negation-small.png',
-    'Blessed by Fate': 'Blessed-by-Fate-small.png',
-    'Broken Armor': 'Broken-Armor-small.png',
-    'Blow of Chaos': 'Blow-of-Chaos-small.png',
-    'Shield Reflector': 'Shield-Reflector-small.png',
-    'Blood Eagle Punishment': 'Blood-Eagle-Punishment-small.png',
-    'Fiery Detonation': 'Fiery-Detonation-small.png',
-    'Bloodstained Icefield': 'Bloodstained-Icefield-small.png',
-    'Berserk Killing Machine': 'Berserk-Killing-Machine-small.png',
-    'Fireball': 'Fiery-Detonation-small.png',
-    'Ice Shard': 'Bloodstained-Icefield-small.png',
-    'Berserker Rage': 'Berserk-Killing-Machine-small.png',
-    'Disarm': 'Disarmament-small.png',
-    'Evasion': 'On-Alert-small.png',
-    'Dispel': 'Blessed-Negation-small.png',
-    'Broken Blade': 'Broken-Armor-small.png',
-    'Immunity Control': 'Divine-Shield-small.png',
-    'Devastation': 'Devastating-Charge-small.png',
-    'Damage Reduction': 'Divine-Shield-small.png',
-    'Retribution': 'Retaliate-small.png',
-    'Lacerate': 'Splinter-small.png'
-  };
-
-  const imageFile = diamondImageMap[skillName] || 'none-small.png';
-  return `/images/skills/small/${imageFile}`;
-}
+import { Hero, Skill } from '@/types';
 
 interface TeamMember {
   hero: Hero | null;
-  slottableSkill1: Skill | null;
-  slottableSkill2: Skill | null;
-  mount: Mount | null;
+  skill1: Skill | null;
+  skill2: Skill | null;
 }
 
-interface FilterOptions {
-  heroClass: HeroClass | 'All';
-  season: string;
-  searchTerm: string;
-  skillType: SkillType | 'All';
-  skillSearchTerm: string;
-  mountElement: string;
-  mountQuality: string;
+interface Team {
+  id: number;
+  members: TeamMember[];
 }
 
 export default function TeamBuilderPage() {
-  const [teams, setTeams] = useState<TeamMember[][]>([
-    [
-      { hero: null, slottableSkill1: null, slottableSkill2: null, mount: null },
-      { hero: null, slottableSkill1: null, slottableSkill2: null, mount: null }
-    ]
+  // Teams state
+  const [teams, setTeams] = useState<Team[]>([
+    {
+      id: 1,
+      members: [
+        { hero: null, skill1: null, skill2: null },
+        { hero: null, skill1: null, skill2: null },
+      ],
+    },
   ]);
-  const [currentTeamIndex, setCurrentTeamIndex] = useState(0);
+  
+  // UI state
+  const [activeTeamId, setActiveTeamId] = useState(1);
+  const [selectionMode, setSelectionMode] = useState<'hero' | 'skill' | null>(null);
+  const [selectionTarget, setSelectionTarget] = useState<{ memberIndex: number; skillSlot?: 1 | 2 } | null>(null);
+  const [heroSearch, setHeroSearch] = useState('');
+  const [skillSearch, setSkillSearch] = useState('');
 
-  const [filters, setFilters] = useState<FilterOptions>({
-    heroClass: 'All',
-    season: 'All',
-    searchTerm: '',
-    skillType: 'All',
-    skillSearchTerm: '',
-    mountElement: 'All',
-    mountQuality: 'All'
-  });
-
-  const [activeTab, setActiveTab] = useState<'heroes' | 'skills' | 'mounts'>('heroes');
-  const [selectedSlot, setSelectedSlot] = useState<{ memberIndex: number; slotNumber: 1 | 2 } | null>(null);
-  const [showShareModal, setShowShareModal] = useState(false);
-  const [teamToShare, setTeamToShare] = useState<number | null>(null);
-  const teamRef = useRef<HTMLDivElement>(null);
+  // Get active team
+  const activeTeam = teams.find(t => t.id === activeTeamId)!;
 
   // Filter heroes
   const filteredHeroes = useMemo(() => {
-    return heroes.filter(hero => {
-      const matchesClass = filters.heroClass === 'All' || hero.heroClass === filters.heroClass;
-      const matchesSeason = filters.season === 'All' || hero.season === filters.season;
-      const matchesSearch = hero.name.toLowerCase().includes(filters.searchTerm.toLowerCase());
-      return matchesClass && matchesSeason && matchesSearch;
-    });
-  }, [filters]);
+    return heroes.filter(h => h.name.toLowerCase().includes(heroSearch.toLowerCase()));
+  }, [heroSearch]);
 
   // Filter skills
   const filteredSkills = useMemo(() => {
-    return skills.filter(skill => {
-      const matchesType = filters.skillType === 'All' || skill.type === filters.skillType;
-      const matchesSearch = skill.name.toLowerCase().includes(filters.skillSearchTerm.toLowerCase());
-      return matchesType && matchesSearch;
-    });
-  }, [filters]);
+    return skills.filter(s => s.name.toLowerCase().includes(skillSearch.toLowerCase()));
+  }, [skillSearch]);
 
-  const handleHeroSelect = (hero: Hero) => {
-    const newTeams = [...teams];
-    const currentTeam = [...newTeams[currentTeamIndex]];
+  // Open hero selection
+  const openHeroSelection = (memberIndex: number) => {
+    setSelectionMode('hero');
+    setSelectionTarget({ memberIndex });
+    setHeroSearch('');
+  };
+
+  // Open skill selection
+  const openSkillSelection = (memberIndex: number, skillSlot: 1 | 2) => {
+    setSelectionMode('skill');
+    setSelectionTarget({ memberIndex, skillSlot });
+    setSkillSearch('');
+  };
+
+  // Select hero
+  const selectHero = (hero: typeof heroes[0]) => {
+    if (!selectionTarget) return;
     
-    // Check if hero is already selected in this team
-    const isHeroAlreadySelected = currentTeam.some(member => member.hero?.id === hero.id);
-    if (isHeroAlreadySelected) {
-      return; // Don't allow duplicate heroes in the same team
+    setTeams(prev => prev.map(team => {
+      if (team.id !== activeTeamId) return team;
+      
+      const newMembers = [...team.members];
+      newMembers[selectionTarget.memberIndex] = {
+        ...newMembers[selectionTarget.memberIndex],
+        hero: hero as Hero,
+      };
+      
+      return { ...team, members: newMembers };
+    }));
+    
+    setSelectionMode(null);
+    setSelectionTarget(null);
+  };
+
+  // Select skill
+  const selectSkill = (skill: typeof skills[0]) => {
+    if (!selectionTarget || !selectionTarget.skillSlot) return;
+    
+    setTeams(prev => prev.map(team => {
+      if (team.id !== activeTeamId) return team;
+      
+      const newMembers = [...team.members];
+      const skillKey = selectionTarget.skillSlot === 1 ? 'skill1' : 'skill2';
+      newMembers[selectionTarget.memberIndex] = {
+        ...newMembers[selectionTarget.memberIndex],
+        [skillKey]: skill as unknown as Skill,
+      };
+      
+      return { ...team, members: newMembers };
+    }));
+    
+    setSelectionMode(null);
+    setSelectionTarget(null);
+  };
+
+  // Remove hero
+  const removeHero = (memberIndex: number) => {
+    setTeams(prev => prev.map(team => {
+      if (team.id !== activeTeamId) return team;
+      
+      const newMembers = [...team.members];
+      newMembers[memberIndex] = { hero: null, skill1: null, skill2: null };
+      
+      return { ...team, members: newMembers };
+    }));
+  };
+
+  // Remove skill
+  const removeSkill = (memberIndex: number, skillSlot: 1 | 2) => {
+    setTeams(prev => prev.map(team => {
+      if (team.id !== activeTeamId) return team;
+      
+      const newMembers = [...team.members];
+      const skillKey = skillSlot === 1 ? 'skill1' : 'skill2';
+      newMembers[memberIndex] = {
+        ...newMembers[memberIndex],
+        [skillKey]: null,
+      };
+      
+      return { ...team, members: newMembers };
+    }));
+  };
+
+  // Add new team
+  const addTeam = () => {
+    const newId = Math.max(...teams.map(t => t.id)) + 1;
+    setTeams(prev => [
+      ...prev,
+      {
+        id: newId,
+        members: [
+          { hero: null, skill1: null, skill2: null },
+          { hero: null, skill1: null, skill2: null },
+        ],
+      },
+    ]);
+    setActiveTeamId(newId);
+  };
+
+  // Delete team
+  const deleteTeam = (teamId: number) => {
+    if (teams.length <= 1) return;
+    
+    setTeams(prev => prev.filter(t => t.id !== teamId));
+    if (activeTeamId === teamId) {
+      setActiveTeamId(teams.find(t => t.id !== teamId)?.id || 1);
     }
-    
-    if (selectedSlot && selectedSlot.slotNumber === 1) {
-      // Manual slot selection - fill the specific slot
-      currentTeam[selectedSlot.memberIndex] = { ...currentTeam[selectedSlot.memberIndex], hero };
-    } else {
-      // Sequential fill logic: slot 0 first, then slot 1, then replace slot 1 if both full
-      if (!currentTeam[0].hero) {
-        // Slot 1 is empty, fill it
-        currentTeam[0] = { ...currentTeam[0], hero };
-      } else if (!currentTeam[1].hero) {
-        // Slot 1 is full, slot 2 is empty, fill slot 2
-        currentTeam[1] = { ...currentTeam[1], hero };
-      } else {
-        // Both slots full, replace slot 2 (last slot)
-        currentTeam[1] = { ...currentTeam[1], hero };
-      }
-    }
-    
-    newTeams[currentTeamIndex] = currentTeam;
-    setTeams(newTeams);
-    
-    // Clear selected slot after selection
-    setSelectedSlot(null);
-  };
-
-  const handleHeroRemove = (memberIndex: number) => {
-    const newTeams = [...teams];
-    const currentTeam = [...newTeams[currentTeamIndex]];
-    currentTeam[memberIndex] = { ...currentTeam[memberIndex], hero: null };
-    newTeams[currentTeamIndex] = currentTeam;
-    setTeams(newTeams);
-  };
-
-  const handleSkillSelect = (skill: Skill) => {
-    if (selectedSlot) {
-      // Manual slot selection - override auto-fill logic
-      const newTeams = [...teams];
-      const currentTeam = [...newTeams[currentTeamIndex]];
-      if (selectedSlot.slotNumber === 1) {
-        currentTeam[selectedSlot.memberIndex].slottableSkill1 = skill;
-      } else {
-        currentTeam[selectedSlot.memberIndex].slottableSkill2 = skill;
-      }
-      newTeams[currentTeamIndex] = currentTeam;
-      setTeams(newTeams);
-      setSelectedSlot(null);
-    } else {
-      // No slot selected, use sequential fill logic
-      const newTeams = [...teams];
-      const currentTeam = [...newTeams[currentTeamIndex]];
-      
-      // Sequential fill: Member 0 Slot 1 → Member 0 Slot 2 → Member 1 Slot 1 → Member 1 Slot 2
-      if (!currentTeam[0].slottableSkill1) {
-        currentTeam[0].slottableSkill1 = skill;
-      } else if (!currentTeam[0].slottableSkill2) {
-        currentTeam[0].slottableSkill2 = skill;
-      } else if (!currentTeam[1].slottableSkill1) {
-        currentTeam[1].slottableSkill1 = skill;
-      } else if (!currentTeam[1].slottableSkill2) {
-        currentTeam[1].slottableSkill2 = skill;
-      } else {
-        // All slots full, replace the last skill slot (Member 1 Slot 2)
-        currentTeam[1].slottableSkill2 = skill;
-      }
-      
-      newTeams[currentTeamIndex] = currentTeam;
-      setTeams(newTeams);
-    }
-  };
-
-  const handleSkillRemove = (memberIndex: number, slotNumber: 1 | 2) => {
-    const newTeams = [...teams];
-    const currentTeam = [...newTeams[currentTeamIndex]];
-    if (slotNumber === 1) {
-      currentTeam[memberIndex].slottableSkill1 = null;
-    } else {
-      currentTeam[memberIndex].slottableSkill2 = null;
-    }
-    newTeams[currentTeamIndex] = currentTeam;
-    setTeams(newTeams);
-  };
-
-  const handleSlotClick = (memberIndex: number, slotNumber: 1 | 2, teamIndex: number) => {
-    setCurrentTeamIndex(teamIndex);
-    setSelectedSlot({ memberIndex, slotNumber });
-    setActiveTab('skills');
-  };
-
-  const handleHeroSlotClick = (memberIndex: number, teamIndex: number) => {
-    setCurrentTeamIndex(teamIndex);
-    setSelectedSlot({ memberIndex, slotNumber: 1 }); // Use slotNumber 1 for hero selection
-    setActiveTab('heroes');
-  };
-
-  const handleMountSlotClick = (memberIndex: number, teamIndex: number) => {
-    setCurrentTeamIndex(teamIndex);
-    setSelectedSlot({ memberIndex, slotNumber: 1 }); // Use slotNumber 1 for mount selection
-    setActiveTab('mounts');
-  };
-
-  const createNewTeam = () => {
-    const newTeam = [
-      { hero: null, slottableSkill1: null, slottableSkill2: null, mount: null },
-      { hero: null, slottableSkill1: null, slottableSkill2: null, mount: null }
-    ];
-    setTeams([...teams, newTeam]);
-    setCurrentTeamIndex(teams.length);
-  };
-
-  const switchTeam = (teamIndex: number) => {
-    setCurrentTeamIndex(teamIndex);
-  };
-
-  const isCurrentTeamComplete = () => {
-    const currentTeam = teams[currentTeamIndex];
-    return currentTeam.every(member => member.hero !== null);
-  };
-
-  const shareTeam = (teamIndex: number) => {
-    setTeamToShare(teamIndex);
-    setShowShareModal(true);
-  };
-
-  const handlePlatformShare = async (platform: 'discord' | 'telegram' | 'whatsapp' | 'clipboard') => {
-    if (teamToShare === null || !teamRef.current) return;
-    
-    try {
-      // Wait a bit to ensure all images are loaded
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Double-check the ref is still available
-      if (!teamRef.current) {
-        throw new Error('Team element not found');
-      }
-      
-      // Dynamically import html2canvas (browser-only library)
-      const html2canvas = (await import('html2canvas')).default;
-      
-      // Take screenshot of the team composition
-      const canvas = await html2canvas(teamRef.current, {
-        backgroundColor: '#1f2937', // gray-800 background
-        scale: 2, // Higher scale for better quality
-        useCORS: true, // Enable CORS for better image handling
-        allowTaint: true,
-        foreignObjectRendering: true,
-        logging: false,
-        width: teamRef.current.offsetWidth,
-        height: teamRef.current.offsetHeight,
-        scrollX: 0,
-        scrollY: 0,
-        windowWidth: teamRef.current.offsetWidth,
-        windowHeight: teamRef.current.offsetHeight
-      });
-      
-      // Convert canvas to blob
-      const blob = await new Promise<Blob>((resolve) => {
-        canvas.toBlob((blob) => {
-          if (blob) resolve(blob);
-        }, 'image/png', 0.9);
-      });
-      
-      // Create file from blob
-      const file = new File([blob], `viking-rise-team-${teamToShare + 1}.png`, { type: 'image/png' });
-      
-      // Use Web Share API for all platforms
-      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({
-          title: `Viking Rise Team ${teamToShare + 1}`,
-          text: 'Check out my team composition!',
-          files: [file]
-        });
-      } else {
-        // Fallback: download image for manual sharing
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `viking-rise-team-${teamToShare + 1}.png`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-        alert('Team screenshot downloaded! You can now share it manually.');
-      }
-    } catch (error) {
-      console.error('Screenshot failed:', error);
-      console.log('Team ref element:', teamRef.current);
-      console.log('Team to share:', teamToShare);
-      alert(`Screenshot failed: ${(error as Error).message}. Falling back to text sharing.`);
-      
-      // Fallback to text sharing
-      const team = teams[teamToShare];
-      const teamText = team.map((member, index) => {
-        const heroName = member.hero?.name || 'Empty';
-        const skill1 = member.slottableSkill1?.name || 'Empty';
-        const skill2 = member.slottableSkill2?.name || 'Empty';
-        const mount = member.mount ? 'Mount Selected' : 'No Mount';
-        
-        return `${index === 0 ? 'Main Commander' : 'Secondary Commander'}: ${heroName}\nSkills: ${skill1}, ${skill2}\nMount: ${mount}`;
-      }).join('\n\n');
-
-      const shareText = `🏰 Viking Rise Team Composition\n\n${teamText}\n\nBuilt with Viking Rise Heroes Database`;
-      navigator.clipboard.writeText(shareText);
-    }
-    
-    setShowShareModal(false);
-    setTeamToShare(null);
   };
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="min-h-screen py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Header */}
-      <div className="bg-gray-900/60 backdrop-blur-md border-b border-gray-700/50 py-8 shadow-2xl">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-6">
-            <Link href="/" className="inline-flex items-center text-gray-400 hover:text-white transition-colors">
-              <span className="mr-2">←</span>
-              Back to Home
-            </Link>
-          </div>
-          <h1 className="text-2xl md:text-3xl font-light text-gray-200 mb-2 tracking-wide drop-shadow-lg">
-            Team Builder
-          </h1>
-          <p className="text-sm text-gray-400 font-light drop-shadow-md">
-            Create and customize your perfect hero teams
-          </p>
-        </div>
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-white mb-4">Team Builder</h1>
+          <p className="text-slate-400">Create and customize your hero teams</p>
       </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          {/* Team Composition */}
-          <div className="lg:col-span-2">
-            <div className="bg-gray-800 rounded-lg p-4">
-              <div className="mb-4">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-bold text-white">Team Composition</h2>
-                  {isCurrentTeamComplete() && (
+        {/* Team Tabs */}
+        <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2">
+          {teams.map((team) => (
                     <button
-                      onClick={createNewTeam}
-                      disabled={!isCurrentTeamComplete()}
-                      className="w-10 h-10 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
-                    >
-                      <span className="text-xl font-light">+</span>
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* All Teams */}
-              {teams.map((team, teamIndex) => (
-                <div 
-                  key={teamIndex} 
-                  className={`mb-6 cursor-pointer transition-all duration-200 ${
-                    teamIndex === currentTeamIndex 
-                      ? 'bg-gray-700/50 rounded-lg p-3' 
-                      : 'hover:bg-gray-700/30 rounded-lg p-3'
-                  }`}
-                  onClick={() => setCurrentTeamIndex(teamIndex)}
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className={`text-lg font-semibold ${
-                      teamIndex === currentTeamIndex ? 'text-white' : 'text-gray-300'
-                    }`}>
-                      Team {teamIndex + 1}
-                    </h3>
-                    <button
+              key={team.id}
+              onClick={() => setActiveTeamId(team.id)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all whitespace-nowrap ${
+                activeTeamId === team.id
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50'
+              }`}
+            >
+              <span>Team {team.id}</span>
+              {teams.length > 1 && (
+                <span
                       onClick={(e) => {
                         e.stopPropagation();
-                        shareTeam(teamIndex);
-                      }}
-                      className="p-2 transition-colors group"
-                    >
-                      <Image
-                        src="/images/gui/share.png"
-                        alt="Share"
-                        width={32}
-                        height={32}
-                        className="object-contain group-hover:hidden"
-                      />
-                      <Image
-                        src="/images/gui/share-active.png"
-                        alt="Share Active"
-                        width={32}
-                        height={32}
-                        className="object-contain hidden group-hover:block"
-                      />
+                    deleteTeam(team.id);
+                  }}
+                  className="w-5 h-5 flex items-center justify-center rounded-full bg-slate-700/50 hover:bg-red-500/50 text-xs"
+                >
+                  ×
+                </span>
+              )}
+            </button>
+          ))}
+          <button
+            onClick={addTeam}
+            className="px-4 py-2 rounded-lg bg-green-600/20 text-green-400 hover:bg-green-600/30 font-medium transition-all"
+          >
+            + Add Team
                     </button>
                   </div>
                   
-                  <div 
-                    ref={teamToShare === teamIndex ? teamRef : null}
-                    className="grid grid-cols-1 md:grid-cols-2 gap-4"
-                  >
-                    {/* Team Title for Screenshot */}
-                    <div className="md:col-span-2 text-center mb-2">
-                      <h4 className="text-lg font-bold text-white">Team {teamIndex + 1}</h4>
-                    </div>
-                    {team.map((member, index) => (
-                      <div key={index} className="bg-gray-700 rounded-lg p-3">
-                        {/* Compact Hero + Skills Layout */}
-                        <div className="flex items-center space-x-3">
-                          {/* Hero Section */}
-                          <div className="flex-shrink-0">
-                            <div className="text-center mb-2">
-                              <span className="text-xs text-gray-400">{index === 0 ? 'Main' : 'Secondary'}</span>
+        {/* Team Composition */}
+        <div className="glass-card p-6 mb-6">
+          <h2 className="text-xl font-bold text-white mb-6">Team {activeTeamId} Composition</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {activeTeam.members.map((member, index) => (
+              <div key={index} className="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50">
+                <div className="text-sm font-medium text-slate-400 mb-3">
+                  {index === 0 ? 'Main Commander' : 'Secondary Commander'}
                             </div>
                             
-                            {member.hero ? (
-                              <div className="relative w-24 h-24 group">
-                                <button
-                                  onClick={() => handleHeroSlotClick(index, teamIndex)}
-                                  className="w-full h-full hover:opacity-80 transition-opacity"
-                                >
-                                  <Image
-                                    src={member.hero.portrait}
-                                    alt={member.hero.name}
-                                    fill
-                                    className="object-contain rounded-lg"
-                                    sizes="64px"
-                                  />
-                                </button>
-                                {/* Hover remove button */}
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleHeroRemove(index);
-                                  }}
-                                  className="absolute -top-1 -right-1 bg-red-500 text-white w-4 h-4 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-red-600 hover:scale-105 z-20 shadow-md border border-red-400"
-                                >
-                                  <span className="text-xs font-medium leading-none">×</span>
-                                </button>
-                              </div>
-                            ) : (
-                              <button
-                                onClick={() => handleHeroSlotClick(index, teamIndex)}
-                                className="relative w-24 h-24 hover:opacity-80 transition-opacity"
-                              >
-                                <Image
-                                  src="/images/heroes/addhero.png"
-                                  alt="Add Hero"
-                                  fill
-                                  className="object-contain rounded-lg"
-                                  sizes="80px"
-                                />
-                              </button>
-                            )}
-                            
-                            {/* Hero Name */}
-                            <div className="text-center mt-1">
-                              {member.hero ? (
-                                <>
-                                  <p className="text-white font-medium text-sm">{member.hero.name}</p>
-                                  <p className="text-gray-400 text-xs">{member.hero.heroClass}</p>
-                                </>
-                              ) : (
-                                <p className="text-gray-400 text-xs">Select Hero</p>
-                              )}
-                            </div>
-                          </div>
-
-                          {/* Skills Section - Horizontal Layout */}
-                          <div className="flex-1">
-                            <div className="text-center mb-2">
-                              <span className="text-xs text-gray-400">Skills</span>
-                            </div>
-                            <div className="flex space-x-2 justify-center">
-                              {/* Skill 1 */}
-                              <div className="flex-shrink-0">
-                                <div className="relative w-16 h-16">
-                                  {member.slottableSkill1 ? (
-                                    <div className="relative w-full h-full group">
-                                      <Image
-                                        src={getDiamondSkillIcon(member.slottableSkill1.name)}
-                                        alt={member.slottableSkill1.name}
-                                        fill
-                                        className="object-contain rounded-lg"
-                                        sizes="64px"
-                                      />
-                                      {/* Hover remove button */}
-                                      <button
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleSkillRemove(index, 1);
-                                        }}
-                                        className="absolute -top-1 -right-1 bg-red-500 text-white w-3 h-3 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-red-600 hover:scale-105 z-20 shadow-md border border-red-400"
-                                      >
-                                        <span className="text-xs font-medium leading-none">×</span>
-                                      </button>
-                                    </div>
-                                  ) : (
-                                    <button
-                                      onClick={() => handleSlotClick(index, 1, teamIndex)}
-                                      className="w-full h-full flex items-center justify-center hover:opacity-80 transition-opacity"
-                                    >
-                                      <Image
-                                        src="/images/skills/small/add.png"
-                                        alt="Add Skill"
-width={64}
-height={64}
-                                        className="object-contain"
-                                      />
-                                    </button>
-                                  )}
-                                </div>
-                              </div>
-
-                              {/* Skill 2 */}
-                              <div className="flex-shrink-0">
-                                <div className="relative w-16 h-16">
-                                  {member.slottableSkill2 ? (
-                                    <div className="relative w-full h-full group">
-                                      <Image
-                                        src={getDiamondSkillIcon(member.slottableSkill2.name)}
-                                        alt={member.slottableSkill2.name}
-                                        fill
-                                        className="object-contain rounded-lg"
-                                        sizes="64px"
-                                      />
-                                      {/* Hover remove button */}
-                                      <button
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleSkillRemove(index, 2);
-                                        }}
-                                        className="absolute -top-1 -right-1 bg-red-500 text-white w-3 h-3 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-red-600 hover:scale-105 z-20 shadow-md border border-red-400"
-                                      >
-                                        <span className="text-xs font-medium leading-none">×</span>
-                                      </button>
-                                    </div>
-                                  ) : (
-                                    <button
-                                      onClick={() => handleSlotClick(index, 2, teamIndex)}
-                                      className="w-full h-full flex items-center justify-center hover:opacity-80 transition-opacity"
-                                    >
-                                      <Image
-                                        src="/images/skills/small/add.png"
-                                        alt="Add Skill"
-width={64}
-height={64}
-                                        className="object-contain"
-                                      />
-                                    </button>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Mount Section - Compact */}
-                          <div className="flex-shrink-0">
-                            <div className="text-center mb-2">
-                              <span className="text-xs text-gray-400">Mount</span>
-                            </div>
-                            <button
-                              onClick={() => handleMountSlotClick(index, teamIndex)}
-                              className="w-16 h-16 flex items-center justify-center hover:opacity-80 transition-opacity"
-                            >
-                              {member.mount ? (
-                                <span className="text-xs font-medium">M</span>
-                              ) : (
-                                <Image
-                                  src="/images/skills/small/add.png"
-                                  alt="Add Mount"
-width={64}
-height={64}
-                                  className="object-contain"
-                                />
-                              )}
-                            </button>
-                          </div>
+                <div className="flex gap-4">
+                  {/* Hero Slot */}
+                  <div className="flex-shrink-0">
+                    {member.hero ? (
+                      <div className="relative group">
+                        <div className="relative w-24 h-24 drop-shadow-[0_0_10px_rgba(255,215,0,0.5)] group-hover:drop-shadow-[0_0_15px_rgba(255,215,0,0.8)] transition-all">
+                          <Image
+                            src={member.hero.portrait}
+                            alt={member.hero.name}
+                            fill
+                            className="object-contain"
+                            sizes="96px"
+                          />
                         </div>
+                        <div className="text-center mt-1">
+                          <span className="text-xs font-bold text-amber-400">{member.hero.name}</span>
+                        </div>
+                        <button
+                          onClick={() => removeHero(index)}
+                          className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity text-xs flex items-center justify-center"
+                        >
+                          ×
+                        </button>
                       </div>
-                    ))}
+                    ) : (
+                      <button
+                        onClick={() => openHeroSelection(index)}
+                        className="w-24 h-24 rounded-xl border-2 border-dashed border-slate-600 flex items-center justify-center text-slate-500 hover:border-amber-500 hover:text-amber-400 transition-colors"
+                      >
+                        <span className="text-3xl">+</span>
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Skill Slots */}
+                  <div className="flex flex-col gap-2 flex-1">
+                    {[1, 2].map((slot) => {
+                      const skill = slot === 1 ? member.skill1 : member.skill2;
+                      return (
+                        <div key={slot} className="flex items-center gap-2">
+                          {skill ? (
+                            <div className="flex items-center gap-2 flex-1 bg-slate-700/50 rounded-lg p-2 group relative">
+                              <div className="relative w-10 h-10 flex-shrink-0">
+                                <Image
+                                  src={skill.icon}
+                                  alt={skill.name}
+                                  fill
+                                  className="object-contain rounded"
+                                  sizes="40px"
+                                />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="text-sm font-medium text-white truncate">{skill.name}</div>
+                                <div className="text-xs text-slate-400">{skill.type}</div>
+                              </div>
+                              <button
+                                onClick={() => removeSkill(index, slot as 1 | 2)}
+                                className="w-5 h-5 bg-red-500/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity text-xs flex items-center justify-center"
+                              >
+                                ×
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => openSkillSelection(index, slot as 1 | 2)}
+                              className="flex-1 h-14 rounded-lg border border-dashed border-slate-600 flex items-center justify-center gap-2 text-slate-500 hover:border-blue-500 hover:text-blue-400 transition-colors"
+                            >
+                              <span>+</span>
+                              <span className="text-sm">Skill {slot}</span>
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Selection Panel */}
-          <div className="bg-gray-800 rounded-lg p-6">
-            <div className="mb-6">
-              <div className="flex space-x-1">
-                <button
-                  onClick={() => setActiveTab('heroes')}
-                  className={`p-2 transition-colors ${
-                    activeTab === 'heroes'
-                      ? 'opacity-100'
-                      : 'opacity-60 hover:opacity-100'
-                  }`}
-                >
-                  <Image
-                    src="/images/gui/guiknothero.png"
-                    alt="Heroes"
-                    width={64}
-                    height={64}
-                    className="object-contain"
-                  />
-                </button>
-                <button
-                  onClick={() => setActiveTab('skills')}
-                  className={`p-2 transition-colors ${
-                    activeTab === 'skills'
-                      ? 'opacity-100'
-                      : 'opacity-60 hover:opacity-100'
-                  }`}
-                >
-                  <Image
-                    src="/images/gui/guiknotskill.png"
-                    alt="Skills"
-                    width={64}
-                    height={64}
-                    className="object-contain"
-                  />
-                </button>
-                <button
-                  onClick={() => setActiveTab('mounts')}
-                  className={`p-2 transition-colors ${
-                    activeTab === 'mounts'
-                      ? 'opacity-100'
-                      : 'opacity-60 hover:opacity-100'
-                  }`}
-                >
-                  <Image
-                    src="/images/gui/guiknotmount.png"
-                    alt="Mounts"
-                    width={64}
-                    height={64}
-                    className="object-contain"
-                  />
-                </button>
+        {/* Quick Stats */}
+        <div className="glass-card p-6">
+          <h3 className="text-lg font-bold text-white mb-4">Team Summary</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-400">
+                {activeTeam.members.filter(m => m.hero).length}
               </div>
+              <div className="text-sm text-slate-400">Heroes</div>
             </div>
-
-            {/* Filters */}
-            {activeTab === 'heroes' && (
-              <div className="mb-6">
-                {/* Class and Season in one row */}
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Class</label>
-                    <select
-                      value={filters.heroClass}
-                      onChange={(e) => setFilters({ ...filters, heroClass: e.target.value as HeroClass | 'All' })}
-                      className="w-full bg-gray-700 text-white rounded-lg px-3 py-2"
-                    >
-                      <option value="All">All Classes</option>
-                      <option value="Infantry">Infantry</option>
-                      <option value="Pikeman">Pikeman</option>
-                      <option value="Archer">Archer</option>
-                      <option value="Porter">Porter</option>
-                      <option value="Polymath">Polymath</option>
-                    </select>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-400">
+                {activeTeam.members.filter(m => m.skill1).length + activeTeam.members.filter(m => m.skill2).length}
                   </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Season</label>
-                    <select
-                      value={filters.season}
-                      onChange={(e) => setFilters({ ...filters, season: e.target.value })}
-                      className="w-full bg-gray-700 text-white rounded-lg px-3 py-2"
-                    >
-                      <option value="All">All Seasons</option>
-                      <option value="Season 1">S1</option>
-                      <option value="Season 2">S2</option>
-                      <option value="Season 3">S3</option>
-                      <option value="Valhalla Collaboration">Valhalla</option>
-                    </select>
+              <div className="text-sm text-slate-400">Skills</div>
                   </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-purple-400">
+                {teams.length}
+                </div>
+              <div className="text-sm text-slate-400">Teams</div>
+                </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-yellow-400">
+                {activeTeam.members.filter(m => m.hero && m.skill1 && m.skill2).length === 2 ? '✓' : '○'}
+              </div>
+              <div className="text-sm text-slate-400">Complete</div>
+            </div>
+          </div>
+        </div>
                 </div>
 
-                {/* Search in separate row */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Search</label>
+      {/* Selection Modal */}
+      {selectionMode && (
+        <div 
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => {
+            setSelectionMode(null);
+            setSelectionTarget(null);
+          }}
+        >
+          <div 
+            className="glass-card max-w-2xl w-full max-h-[80vh] overflow-hidden flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="p-4 border-b border-slate-700/50">
+              <h2 className="text-xl font-bold text-white">
+                {selectionMode === 'hero' ? 'Select Hero' : 'Select Skill'}
+              </h2>
                   <input
                     type="text"
-                    value={filters.searchTerm}
-                    onChange={(e) => setFilters({ ...filters, searchTerm: e.target.value })}
-                    placeholder="Search heroes..."
-                    className="w-full bg-gray-700 text-white rounded-lg px-3 py-2"
+                placeholder={`Search ${selectionMode === 'hero' ? 'heroes' : 'skills'}...`}
+                value={selectionMode === 'hero' ? heroSearch : skillSearch}
+                onChange={(e) => selectionMode === 'hero' ? setHeroSearch(e.target.value) : setSkillSearch(e.target.value)}
+                className="input-dark mt-3"
+                autoFocus
                   />
                 </div>
-              </div>
-            )}
 
-            {activeTab === 'skills' && (
-              <div className="space-y-4 mb-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Type</label>
-                  <select
-                    value={filters.skillType}
-                    onChange={(e) => setFilters({ ...filters, skillType: e.target.value as SkillType | 'All' })}
-                    className="w-full bg-gray-700 text-white rounded-lg px-3 py-2"
-                  >
-                    <option value="All">All Types</option>
-                    <option value="Active">Active</option>
-                    <option value="Passive">Passive</option>
-                    <option value="Command">Command</option>
-                    <option value="Cooperation">Cooperation</option>
-                    <option value="Counterattack">Counterattack</option>
-                  </select>
+            {/* Modal Content */}
+            <div className="flex-1 overflow-y-auto p-4">
+              {selectionMode === 'hero' ? (
+                <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-3">
+                  {filteredHeroes.map((hero) => (
+                    <button
+                      key={hero.id}
+                      onClick={() => selectHero(hero)}
+                      className="relative group text-center"
+                    >
+                      <div className="relative w-full aspect-square transition-all duration-200 hover:scale-105 group-hover:drop-shadow-[0_0_12px_rgba(255,215,0,0.8)]">
+                        <Image
+                          src={hero.portrait}
+                          alt={hero.name}
+                          fill
+                          className="object-contain"
+                          sizes="(max-width: 640px) 25vw, 16vw"
+                        />
+                      </div>
+                      <div className="mt-1">
+                        <span className="text-[10px] font-bold text-slate-300 group-hover:text-amber-400 transition-colors">{hero.name}</span>
+                      </div>
+                    </button>
+                  ))}
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Search</label>
-                  <input
-                    type="text"
-                    value={filters.skillSearchTerm}
-                    onChange={(e) => setFilters({ ...filters, skillSearchTerm: e.target.value })}
-                    placeholder="Search skills..."
-                    className="w-full bg-gray-700 text-white rounded-lg px-3 py-2"
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Selection Grid */}
-            <div className="max-h-[500px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800 hover:scrollbar-thumb-gray-500">
-              {activeTab === 'heroes' && (
-                <div className="grid grid-cols-1 gap-3">
-                  {filteredHeroes.map((hero) => {
-                        const isSelectedInCurrentTeam = teams[currentTeamIndex].some(member => member.hero?.id === hero.id);
-                        
-                        return (
-                          <button
-                            key={hero.id}
-                            onClick={() => {
-                              if (isSelectedInCurrentTeam) {
-                                // If hero is already selected, remove it
-                                const memberIndex = teams[currentTeamIndex].findIndex(member => member.hero?.id === hero.id);
-                                if (memberIndex !== -1) {
-                                  handleHeroRemove(memberIndex);
-                                }
-                              } else {
-                                // If hero is not selected, add it (will replace last slot if full)
-                                handleHeroSelect(hero);
-                              }
-                            }}
-                            className={`rounded-lg p-4 transition-colors text-left ${
-                              isSelectedInCurrentTeam
-                                ? 'bg-green-700 text-green-300 hover:bg-red-700 hover:text-red-300'
-                                : 'bg-gray-700 hover:bg-gray-600'
-                            }`}
-                      >
-                        <div className="flex items-center space-x-4">
-                          <div className="relative w-16 h-16">
-                            <Image
-                              src={hero.portrait}
-                              alt={hero.name}
-                              fill
-                              className="object-contain rounded-lg"
-                              sizes="80px"
-                            />
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-base text-white font-semibold">{hero.name}</p>
-                            <p className="text-sm text-gray-400">{hero.heroClass}</p>
-                            {isSelectedInCurrentTeam && (
-                              <p className="text-sm text-green-300 font-bold">✓ Selected</p>
-                            )}
-                          </div>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-
-              {activeTab === 'skills' && (
-                <div className="grid grid-cols-1 gap-3">
-                  {filteredSkills.map((skill) => {
-                    // Check if this skill is currently selected in any slot
-                    const isSelectedInCurrentTeam = teams[currentTeamIndex].some(member => 
-                      member.slottableSkill1?.id === skill.id || member.slottableSkill2?.id === skill.id
-                    );
-                    
-                        return (
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {filteredSkills.map((skill) => (
                           <button
                             key={skill.id}
-                            onClick={() => {
-                              if (isSelectedInCurrentTeam) {
-                                // If skill is already selected, remove it
-                                const currentTeam = teams[currentTeamIndex];
-                                for (let memberIndex = 0; memberIndex < currentTeam.length; memberIndex++) {
-                                  const member = currentTeam[memberIndex];
-                                  if (member.slottableSkill1?.id === skill.id) {
-                                    handleSkillRemove(memberIndex, 1);
-                                    return;
-                                  } else if (member.slottableSkill2?.id === skill.id) {
-                                    handleSkillRemove(memberIndex, 2);
-                                    return;
-                                  }
-                                }
-                              } else {
-                                // If skill is not selected, add it (will replace last slot if full)
-                                handleSkillSelect(skill);
-                              }
-                            }}
-                            className={`rounded-lg p-4 transition-colors ${
-                              isSelectedInCurrentTeam
-                                ? 'bg-green-700 text-green-300 hover:bg-red-700 hover:text-red-300'
-                                : 'bg-gray-700 hover:bg-gray-600'
-                            }`}
-                      >
-                      <div className="flex items-center space-x-4">
-                        <div className="relative w-16 h-16">
+                      onClick={() => selectSkill(skill)}
+                      className="flex items-center gap-3 p-3 rounded-lg bg-slate-800/50 hover:bg-slate-700/50 transition-colors text-left"
+                    >
+                      <div className="relative w-12 h-12 flex-shrink-0">
                           <Image
                             src={skill.icon}
                             alt={skill.name}
                             fill
-                            className="object-contain rounded-lg"
-                            sizes="80px"
+                          className="object-contain rounded"
+                          sizes="48px"
                           />
                         </div>
-                        <div className="flex-1">
-                          <p className="text-base text-white font-semibold">{skill.name}</p>
-                          <p className="text-sm text-gray-400">{skill.type}</p>
-                          <p className="text-xs text-gray-500">{skill.probability}%</p>
-                          {isSelectedInCurrentTeam && (
-                            <p className="text-xs text-green-300 font-bold">✓ Selected</p>
-                          )}
-                        </div>
+                      <div>
+                        <div className="font-medium text-white">{skill.name}</div>
+                        <div className="text-xs text-slate-400">{skill.type}</div>
                       </div>
                     </button>
-                    );
-                  })}
+                  ))}
                 </div>
               )}
-
-              {activeTab === 'mounts' && (
-                <div className="text-center py-8">
-                  <p className="text-gray-400">Mount selection coming soon!</p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
       </div>
 
-      {/* Share Modal */}
-      {showShareModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-semibold text-white">Share Team {teamToShare !== null ? teamToShare + 1 : ''}</h3>
+            {/* Modal Footer */}
+            <div className="p-4 border-t border-slate-700/50">
               <button
                 onClick={() => {
-                  setShowShareModal(false);
-                  setTeamToShare(null);
+                  setSelectionMode(null);
+                  setSelectionTarget(null);
                 }}
-                className="text-gray-400 hover:text-white transition-colors"
+                className="btn-secondary w-full"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            
-            <p className="text-gray-300 mb-6">Choose a platform to share your team composition:</p>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <button
-                onClick={() => handlePlatformShare('discord')}
-                className="flex flex-col items-center p-4 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors group"
-              >
-                <Image
-                  src="/images/gui/discord.png"
-                  alt="Discord"
-                  width={48}
-                  height={48}
-                  className="object-contain mb-2"
-                />
-                <span className="text-white font-medium">Discord</span>
-                <span className="text-xs text-gray-400">Copy to clipboard</span>
-              </button>
-              
-              <button
-                onClick={() => handlePlatformShare('telegram')}
-                className="flex flex-col items-center p-4 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors group"
-              >
-                <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mb-2">
-                  <span className="text-white text-xl font-bold">T</span>
-                </div>
-                <span className="text-white font-medium">Telegram</span>
-                <span className="text-xs text-gray-400">Open in app</span>
-              </button>
-              
-              <button
-                onClick={() => handlePlatformShare('whatsapp')}
-                className="flex flex-col items-center p-4 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors group"
-              >
-                <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mb-2">
-                  <span className="text-white text-xl font-bold">W</span>
-                </div>
-                <span className="text-white font-medium">WhatsApp</span>
-                <span className="text-xs text-gray-400">Open in app</span>
-              </button>
-              
-              <button
-                onClick={() => handlePlatformShare('clipboard')}
-                className="flex flex-col items-center p-4 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors group"
-              >
-                <div className="w-12 h-12 bg-gray-500 rounded-lg flex items-center justify-center mb-2">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                  </svg>
-                </div>
-                <span className="text-white font-medium">Clipboard</span>
-                <span className="text-xs text-gray-400">Copy text</span>
+                Cancel
               </button>
             </div>
           </div>

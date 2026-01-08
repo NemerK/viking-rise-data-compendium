@@ -2,61 +2,62 @@
 
 import { useEffect, useRef } from 'react';
 
-const AnimatedBackground = () => {
+export default function AnimatedBackground() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
-    // Create embers
+    // Norse runes for floating effect
+    const runes = ['ᚠ', 'ᚢ', 'ᚦ', 'ᚨ', 'ᚱ', 'ᚲ', 'ᚷ', 'ᚹ', 'ᚺ', 'ᚾ', 'ᛁ', 'ᛃ', 'ᛇ', 'ᛈ', 'ᛉ', 'ᛊ', 'ᛏ', 'ᛒ', 'ᛖ', 'ᛗ', 'ᛚ', 'ᛜ', 'ᛟ', 'ᛞ'];
+
+    // Create red falling embers
     const createEmbers = () => {
-      const emberCount = 50;
-      for (let i = 0; i < emberCount; i++) {
+      for (let i = 0; i < 40; i++) {
         const ember = document.createElement('div');
         ember.className = 'ember';
-        ember.style.left = Math.random() * 100 + '%';
-        ember.style.animationDuration = (Math.random() * 20 + 30) + 's';
-        ember.style.animationDelay = Math.random() * 10 + 's';
+        ember.style.left = `${Math.random() * 100}%`;
+        ember.style.animationDuration = `${15 + Math.random() * 20}s`;
+        ember.style.animationDelay = `${Math.random() * 15}s`;
+        ember.style.width = `${2 + Math.random() * 4}px`;
+        ember.style.height = ember.style.width;
         container.appendChild(ember);
       }
     };
 
-    // Create floating runes
+    // Create blue floating runes
     const createRunes = () => {
-      const runeCount = 15;
-      const runes = ['ᚠ', 'ᚢ', 'ᚦ', 'ᚨ', 'ᚱ', 'ᚲ', 'ᚷ', 'ᚹ', 'ᚺ', 'ᚾ', 'ᛁ', 'ᛃ', 'ᛇ', 'ᛈ', 'ᛉ', 'ᛊ', 'ᛏ', 'ᛒ', 'ᛖ', 'ᛗ', 'ᛚ', 'ᛜ', 'ᛟ', 'ᛞ'];
-      
-      for (let i = 0; i < runeCount; i++) {
+      for (let i = 0; i < 12; i++) {
         const rune = document.createElement('div');
         rune.className = 'rune';
         rune.textContent = runes[Math.floor(Math.random() * runes.length)];
-        rune.style.left = Math.random() * 100 + '%';
-        rune.style.animationDuration = (Math.random() * 25 + 30) + 's';
-        rune.style.animationDelay = Math.random() * 15 + 's';
+        rune.style.left = `${Math.random() * 100}%`;
+        rune.style.animationDuration = `${25 + Math.random() * 20}s`;
+        rune.style.animationDelay = `${Math.random() * 20}s`;
+        rune.style.fontSize = `${20 + Math.random() * 16}px`;
         container.appendChild(rune);
       }
     };
 
     // Create sparkling stars
     const createStars = () => {
-      const starCount = 30;
-      for (let i = 0; i < starCount; i++) {
+      for (let i = 0; i < 25; i++) {
         const star = document.createElement('div');
         star.className = 'star';
-        star.style.left = Math.random() * 100 + '%';
-        star.style.animationDuration = (Math.random() * 15 + 20) + 's';
-        star.style.animationDelay = Math.random() * 8 + 's';
+        star.style.left = `${Math.random() * 100}%`;
+        star.style.animationDuration = `${12 + Math.random() * 15}s`;
+        star.style.animationDelay = `${Math.random() * 12}s`;
         container.appendChild(star);
       }
     };
 
-    // Create all particles
+    // Initialize particles
     createEmbers();
     createRunes();
     createStars();
 
-    // Cleanup function
+    // Cleanup
     return () => {
       if (container) {
         container.innerHTML = '';
@@ -70,6 +71,4 @@ const AnimatedBackground = () => {
       <div className="background-overlay" />
     </>
   );
-};
-
-export default AnimatedBackground;
+}
