@@ -1333,5 +1333,49 @@ export const heroes = [
       "icon": "https://res.cloudinary.com/dcffye9wb/image/upload/v1768336901/viking-rise/skills/awakened/xvx6lx0fcgrvboscazem.png",
       "description": "333333"
     }
+  },
+  {
+    "id": 45,
+    "name": "test hero",
+    "portrait": "https://res.cloudinary.com/dcffye9wb/image/upload/v1768337738/viking-rise/heroes/k5l0yrmzrvgtdecqani6.png",
+    "rarity": "Epic",
+    "season": "S2",
+    "troopType": "Infantry",
+    "specialty": "PvP",
+    "excellence": "Basic Attack",
+    "talent1": {
+      "name": "talent 1",
+      "icon": "https://res.cloudinary.com/dcffye9wb/image/upload/v1768337765/viking-rise/talents/gxhmp8gv6kkgprxdbjli.png",
+      "description": "talent description 1"
+    },
+    "talent2": {
+      "name": "talent 2",
+      "icon": "https://res.cloudinary.com/dcffye9wb/image/upload/v1768337767/viking-rise/talents/qnfubkblqylbhbi8ar58.png",
+      "description": "talent description 2"
+    },
+    "talent3": {
+      "name": "talent 3",
+      "icon": "https://res.cloudinary.com/dcffye9wb/image/upload/v1768337768/viking-rise/talents/ry9kw3kduynot4dohphw.png",
+      "description": "talent description 3"
+    },
+    "uniqueSkill1": {
+      "name": "skill 1",
+      "icon": "https://res.cloudinary.com/dcffye9wb/image/upload/v1768337772/viking-rise/skills/hydiueqedyjpjwxt6l1e.png",
+      "type": "passive",
+      "probability": 100,
+      "description": "skill description 1"
+    },
+    "uniqueSkill2": {
+      "name": "skill 2",
+      "icon": "https://res.cloudinary.com/dcffye9wb/image/upload/v1768337774/viking-rise/skills/nompz40n775dqqlwtymz.png",
+      "type": "command",
+      "probability": 25,
+      "description": "skill description 2"
+    },
+    "awakenedSkill": {
+      "name": "awakened skill",
+      "icon": "https://res.cloudinary.com/dcffye9wb/image/upload/v1768337802/viking-rise/skills/awakened/rfa5am5ilbksadr1wkev.png",
+      "description": "skill awakened"
+    }
   }
 ];
