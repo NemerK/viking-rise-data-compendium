@@ -11,8 +11,8 @@ export default function AdminDashboard() {
   const commonHeroes = heroes.filter(h => h.rarity === 'Common').length;
   const unclassifiedHeroes = heroes.filter(h => !h.rarity).length;
 
-  const uniqueSkills = skills.filter(s => s.isUnique).length;
-  const generalSkills = skills.filter(s => !s.isUnique).length;
+  const uniqueSkills = skills.filter(s => (s as any).isUnique).length;
+  const generalSkills = skills.filter(s => !(s as any).isUnique).length;
 
   const stats = [
     { 
