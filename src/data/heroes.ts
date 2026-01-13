@@ -1291,50 +1291,6 @@ export const heroes = [
     "lacerate": false
   },
   {
-    "id": 44,
-    "name": "test",
-    "portrait": "https://res.cloudinary.com/dcffye9wb/image/upload/v1768336864/viking-rise/heroes/kwwoduryznahbwsh6txl.png",
-    "rarity": "Epic",
-    "season": "S2",
-    "troopType": "Leader",
-    "specialty": "Gathering",
-    "excellence": "Support",
-    "talent1": {
-      "name": "1",
-      "icon": "https://res.cloudinary.com/dcffye9wb/image/upload/v1768336873/viking-rise/talents/tptu6mpkhgiijjuror1t.png",
-      "description": "1"
-    },
-    "talent2": {
-      "name": "2",
-      "icon": "https://res.cloudinary.com/dcffye9wb/image/upload/v1768336875/viking-rise/talents/wpirhxsyavuvjkpjgcm4.png",
-      "description": "2"
-    },
-    "talent3": {
-      "name": "3",
-      "icon": "https://res.cloudinary.com/dcffye9wb/image/upload/v1768336875/viking-rise/talents/du4jwii8cxyhhizlghdz.png",
-      "description": "3"
-    },
-    "uniqueSkill1": {
-      "name": "1",
-      "icon": "https://res.cloudinary.com/dcffye9wb/image/upload/v1768336885/viking-rise/skills/sbjcnqsy24yapwnewvqe.png",
-      "type": "passive",
-      "probability": 11,
-      "description": "1111"
-    },
-    "uniqueSkill2": {
-      "name": "222",
-      "icon": "https://res.cloudinary.com/dcffye9wb/image/upload/v1768336892/viking-rise/skills/in1i4vtydu8o3zxuwejr.png",
-      "type": "active",
-      "probability": 22,
-      "description": "22222"
-    },
-    "awakenedSkill": {
-      "name": "AW",
-      "icon": "https://res.cloudinary.com/dcffye9wb/image/upload/v1768336901/viking-rise/skills/awakened/xvx6lx0fcgrvboscazem.png",
-      "description": "333333"
-    }
-  },
-  {
     "id": 45,
     "name": "test hero",
     "portrait": "https://res.cloudinary.com/dcffye9wb/image/upload/v1768337738/viking-rise/heroes/k5l0yrmzrvgtdecqani6.png",
