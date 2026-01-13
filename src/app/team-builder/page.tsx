@@ -238,7 +238,7 @@ export default function TeamBuilderPage() {
                                 onDragStart={(e) => handleDragStart(e, { type: 'skill', skill, source: { teamId: activeTeamId, memberIndex: index, slot: slot as 1 | 2 } })}
                               >
                                 <div className="relative w-9 h-9 flex-shrink-0">
-                                  <Image src={skill.icon} alt={skill.name} fill className="object-contain rounded" sizes="36px" draggable={false} />
+                                  <Image src={skill.icon || skill.iconRegular || skill.iconDiamond || '/images/skills/none.png'} alt={skill.name} fill className="object-contain rounded" sizes="36px" draggable={false} />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                   <div className="text-sm text-white font-medium truncate">{skill.name}</div>
