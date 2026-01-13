@@ -100,11 +100,11 @@ export default function HeroDetailPage({ params }: { params: Promise<{ name: str
               <h1 className="text-4xl font-bold text-white mb-3">{hero.name}</h1>
               
               <div className="flex flex-wrap justify-center md:justify-start gap-3 mb-4">
-                <span className={`px-4 py-1.5 rounded-full text-sm font-bold text-white bg-gradient-to-r ${getTypeColor(hero.herotype)}`}>
-                  {hero.herotype}
+                <span className={`px-4 py-1.5 rounded-full text-sm font-bold text-white bg-gradient-to-r ${getTypeColor(hero.herotype || hero.troopType || 'Unknown')}`}>
+                  {hero.herotype || hero.troopType || 'Unknown'}
                 </span>
                 <span className="px-4 py-1.5 rounded-full text-sm font-medium text-slate-200 bg-slate-700/50">
-                  {hero.heroclass}
+                  {hero.heroclass || hero.specialty || 'Unknown'}
                 </span>
                 <span className="px-4 py-1.5 rounded-full text-sm font-medium text-slate-300 bg-slate-800/50">
                   ID: {hero.id}
@@ -112,7 +112,7 @@ export default function HeroDetailPage({ params }: { params: Promise<{ name: str
               </div>
 
               <p className="text-slate-400">
-                {hero.name} is a {hero.heroclass.toLowerCase()} type {hero.herotype.toLowerCase()} hero 
+                {hero.name} is a {(hero.heroclass || hero.specialty || 'versatile').toLowerCase()} type {(hero.herotype || hero.troopType || 'warrior').toLowerCase()} hero 
                 with {activeAbilities.length} special abilities.
               </p>
             </div>
