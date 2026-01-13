@@ -1292,46 +1292,46 @@ export const heroes = [
   },
   {
     "id": 44,
-    "name": "Test",
-    "portrait": "https://res.cloudinary.com/dcffye9wb/image/upload/v1768336379/viking-rise/heroes/uc6qesegipilhba8akp5.png",
+    "name": "test",
+    "portrait": "https://res.cloudinary.com/dcffye9wb/image/upload/v1768336864/viking-rise/heroes/kwwoduryznahbwsh6txl.png",
     "rarity": "Epic",
     "season": "S2",
-    "troopType": "Infantry",
-    "specialty": "PvP",
-    "excellence": "Basic Attack",
+    "troopType": "Leader",
+    "specialty": "Gathering",
+    "excellence": "Support",
     "talent1": {
-      "name": "talent 1",
-      "icon": "https://res.cloudinary.com/dcffye9wb/image/upload/v1768336392/viking-rise/talents/b3vibqkktwdl6mrtzufv.png",
-      "description": "Test Talent 1"
+      "name": "1",
+      "icon": "https://res.cloudinary.com/dcffye9wb/image/upload/v1768336873/viking-rise/talents/tptu6mpkhgiijjuror1t.png",
+      "description": "1"
     },
     "talent2": {
-      "name": "talent 2",
-      "icon": "https://res.cloudinary.com/dcffye9wb/image/upload/v1768336394/viking-rise/talents/hmheuaxloirtm0xipylc.png",
-      "description": "Test Talent 2"
+      "name": "2",
+      "icon": "https://res.cloudinary.com/dcffye9wb/image/upload/v1768336875/viking-rise/talents/wpirhxsyavuvjkpjgcm4.png",
+      "description": "2"
     },
     "talent3": {
-      "name": "talent 3",
-      "icon": "https://res.cloudinary.com/dcffye9wb/image/upload/v1768336400/viking-rise/talents/nfxbh3lws2kbmfmrggyb.png",
-      "description": "Test Talent 3"
+      "name": "3",
+      "icon": "https://res.cloudinary.com/dcffye9wb/image/upload/v1768336875/viking-rise/talents/du4jwii8cxyhhizlghdz.png",
+      "description": "3"
     },
     "uniqueSkill1": {
-      "name": "Skill 1",
-      "icon": "https://res.cloudinary.com/dcffye9wb/image/upload/v1768336478/viking-rise/skills/b1c0awwu7mxngbyeqysi.png",
-      "type": "command",
-      "probability": 25,
-      "description": "idk some Leshy type shenanigans"
+      "name": "1",
+      "icon": "https://res.cloudinary.com/dcffye9wb/image/upload/v1768336885/viking-rise/skills/sbjcnqsy24yapwnewvqe.png",
+      "type": "passive",
+      "probability": 11,
+      "description": "1111"
     },
     "uniqueSkill2": {
-      "name": "skill 2",
-      "icon": "https://res.cloudinary.com/dcffye9wb/image/upload/v1768336502/viking-rise/skills/pt6dtg4i7xp61gbrwect.png",
-      "type": "passive",
-      "probability": 100,
-      "description": "not Leshy"
+      "name": "222",
+      "icon": "https://res.cloudinary.com/dcffye9wb/image/upload/v1768336892/viking-rise/skills/in1i4vtydu8o3zxuwejr.png",
+      "type": "active",
+      "probability": 22,
+      "description": "22222"
     },
     "awakenedSkill": {
-      "name": "Awakened",
-      "icon": "https://res.cloudinary.com/dcffye9wb/image/upload/v1768336522/viking-rise/skills/awakened/ifjy54okofrfdufw7kgh.png",
-      "description": "Awakened Leshy"
+      "name": "AW",
+      "icon": "https://res.cloudinary.com/dcffye9wb/image/upload/v1768336901/viking-rise/skills/awakened/xvx6lx0fcgrvboscazem.png",
+      "description": "333333"
     }
   }
 ];
