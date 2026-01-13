@@ -49,14 +49,14 @@ export interface Hero {
   portrait: string; // regular image
   
   // Basic Info (optional for backward compatibility)
-  rarity?: 'Legendary' | 'Epic' | 'Common'; // Yellow, Purple, Blue
-  season?: 'Base' | 'S1' | 'S2' | 'S3' | 'Sx' | 'Valhalla';
+  rarity?: string; // 'Legendary' | 'Epic' | 'Common'
+  season?: string; // 'Base' | 'S1' | 'S2' | 'S3' | 'Sx' | 'Valhalla'
   portraitDiamond?: string; // optional diamond version
   
   // Categories (optional for backward compatibility)
-  troopType?: 'Pikeman' | 'Infantry' | 'Archer' | 'Leader' | 'Porter';
-  specialty?: 'PvP' | 'Gathering' | 'Jungler' | 'Polymath';
-  excellence?: 'Counterattack' | 'Skills' | 'Support' | 'Mount Development' | 'Basic Attack' | 'Defence';
+  troopType?: string; // 'Pikeman' | 'Infantry' | 'Archer' | 'Leader' | 'Porter'
+  specialty?: string; // 'PvP' | 'Gathering' | 'Jungler' | 'Polymath'
+  excellence?: string; // 'Counterattack' | 'Skills' | 'Support' | 'Mount Development' | 'Basic Attack' | 'Defence'
   
   // 3 Special Talents (inline with hero) - optional for backward compatibility
   talents?: Talent[]; // Legacy array format
@@ -151,8 +151,8 @@ export interface Mount {
   name: string;
   
   // Type & Visual
-  element: 'Life' | 'Light' | 'Fire' | 'Ice' | 'Destruction' | 'Darkness';
-  troopBenefit: 'Infantry' | 'Pikeman' | 'Archer' | 'Skill Defense' | 'Skill Attack' | 'All Troops';
+  element: string; // 'Life' | 'Light' | 'Fire' | 'Ice' | 'Destruction' | 'Darkness'
+  troopBenefit: string; // 'Infantry' | 'Pikeman' | 'Archer' | 'Skill Defense' | 'Skill Attack' | 'All Troops'
   icon: string;
   
   // Skills (2 when awakened)
@@ -179,7 +179,7 @@ export interface HeroFilters {
   heroclass: string;
   search: string;
   ability: string;
-  rarity?: 'Legendary' | 'Epic' | 'Common' | 'All';
+  rarity?: string;
   season?: string;
   troopType?: string;
 }
