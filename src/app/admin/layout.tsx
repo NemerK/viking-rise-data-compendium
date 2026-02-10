@@ -1,3 +1,5 @@
+'use client';
+
 import AdminSidebar from './components/AdminSidebar';
 import { AdminProvider } from './context/AdminContext';
 

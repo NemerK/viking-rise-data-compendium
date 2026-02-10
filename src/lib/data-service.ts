@@ -2,7 +2,7 @@
  * Data Service - Fetches data from Supabase and transforms to app format
  */
 
-import { supabase, DbHero, DbHeroSkill, DbHeroTalent, DbSkill } from './supabase';
+import { getSupabase, DbHero, DbHeroSkill, DbHeroTalent, DbSkill } from './supabase';
 import { Hero, Skill } from '@/types';
 
 // Transform database hero to app Hero format
@@ -96,6 +96,7 @@ let cacheLoadingPromise: Promise<void> | null = null;
 
 // Fetch all heroes
 export async function getHeroes(): Promise<Hero[]> {
+  const supabase = getSupabase();
   const { data, error } = await supabase
     .from('heroes')
     .select('*')
@@ -111,6 +112,7 @@ export async function getHeroes(): Promise<Hero[]> {
 
 // Fetch all skills
 export async function getSkills(): Promise<Skill[]> {
+  const supabase = getSupabase();
   const { data, error } = await supabase
     .from('skills')
     .select('*')
@@ -137,6 +139,7 @@ async function loadHeroSkillsCache(): Promise<void> {
   // Start loading
   cacheLoadingPromise = (async () => {
     try {
+      const supabase = getSupabase();
       const [skillsResult, talentsResult] = await Promise.all([
         supabase.from('hero_skills').select('*').order('hero_id'),
         supabase.from('hero_talents').select('*').order('hero_id'),

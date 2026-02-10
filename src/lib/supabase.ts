@@ -1,9 +1,21 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+// Lazy-initialized Supabase client (avoids build-time errors)
+let supabaseInstance: SupabaseClient | null = null;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export function getSupabase(): SupabaseClient {
+  if (supabaseInstance) return supabaseInstance;
+  
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error('Missing Supabase environment variables');
+  }
+  
+  supabaseInstance = createClient(supabaseUrl, supabaseAnonKey);
+  return supabaseInstance;
+}
 
 // Database types based on our schema
 export interface DbHero {
@@ -101,118 +113,4 @@ export interface DbSkill {
   lacerate: boolean;
   created_at?: string;
   updated_at?: string;
-}
-
-// Fetch functions
-export async function fetchHeroes(): Promise<DbHero[]> {
-  const { data, error } = await supabase
-    .from('heroes')
-    .select('*')
-    .order('id');
-  
-  if (error) {
-    console.error('Error fetching heroes:', error);
-    return [];
-  }
-  return data || [];
-}
-
-export async function fetchHeroSkills(heroId?: number): Promise<DbHeroSkill[]> {
-  let query = supabase.from('hero_skills').select('*');
-  
-  if (heroId) {
-    query = query.eq('hero_id', heroId);
-  }
-  
-  const { data, error } = await query.order('hero_id').order('slot');
-  
-  if (error) {
-    console.error('Error fetching hero skills:', error);
-    return [];
-  }
-  return data || [];
-}
-
-export async function fetchHeroTalents(heroId?: number): Promise<DbHeroTalent[]> {
-  let query = supabase.from('hero_talents').select('*');
-  
-  if (heroId) {
-    query = query.eq('hero_id', heroId);
-  }
-  
-  const { data, error } = await query.order('hero_id').order('slot');
-  
-  if (error) {
-    console.error('Error fetching hero talents:', error);
-    return [];
-  }
-  return data || [];
-}
-
-export async function fetchSkills(): Promise<DbSkill[]> {
-  const { data, error } = await supabase
-    .from('skills')
-    .select('*')
-    .order('id');
-  
-  if (error) {
-    console.error('Error fetching skills:', error);
-    return [];
-  }
-  return data || [];
-}
-
-// Insert/Update functions for admin
-export async function upsertHero(hero: Partial<DbHero>): Promise<DbHero | null> {
-  const { data, error } = await supabase
-    .from('heroes')
-    .upsert(hero)
-    .select()
-    .single();
-  
-  if (error) {
-    console.error('Error upserting hero:', error);
-    return null;
-  }
-  return data;
-}
-
-export async function upsertSkill(skill: Partial<DbSkill>): Promise<DbSkill | null> {
-  const { data, error } = await supabase
-    .from('skills')
-    .upsert(skill)
-    .select()
-    .single();
-  
-  if (error) {
-    console.error('Error upserting skill:', error);
-    return null;
-  }
-  return data;
-}
-
-export async function deleteHero(id: number): Promise<boolean> {
-  const { error } = await supabase
-    .from('heroes')
-    .delete()
-    .eq('id', id);
-  
-  if (error) {
-    console.error('Error deleting hero:', error);
-    return false;
-  }
-  return true;
-}
-
-export async function deleteSkill(id: number): Promise<boolean> {
-  const { error } = await supabase
-    .from('skills')
-    .delete()
-    .eq('id', id);
-  
-  if (error) {
-    console.error('Error deleting skill:', error);
-    return false;
-  }
-  return true;
 }

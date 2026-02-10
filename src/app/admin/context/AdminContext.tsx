@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { Hero, Skill, Talent, Mount, AdminState } from '@/types';
-import { supabase } from '@/lib/supabase';
+import { getSupabase } from '@/lib/supabase';
 
 // Hero skill from database
 export interface DbHeroSkill {
@@ -89,6 +89,8 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     setError(null);
     
     try {
+      const supabase = getSupabase();
+      
       // Fetch heroes
       const { data: heroesData, error: heroesError } = await supabase
         .from('heroes')
@@ -232,6 +234,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   const addHero = async (hero: Omit<Hero, 'id'>): Promise<Hero | null> => {
     setSaving(true);
     try {
+      const supabase = getSupabase();
       const { data, error } = await supabase
         .from('heroes')
         .insert({
@@ -284,6 +287,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   const updateHero = async (id: number, updates: Partial<Hero>): Promise<boolean> => {
     setSaving(true);
     try {
+      const supabase = getSupabase();
       const { error } = await supabase
         .from('heroes')
         .update(updates)
@@ -307,6 +311,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   const deleteHero = async (id: number): Promise<boolean> => {
     setSaving(true);
     try {
+      const supabase = getSupabase();
       const { error } = await supabase
         .from('heroes')
         .delete()
@@ -352,6 +357,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   ): Promise<boolean> => {
     setSaving(true);
     try {
+      const supabase = getSupabase();
       const { error } = await supabase
         .from('hero_skills')
         .upsert({
@@ -411,6 +417,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   ): Promise<boolean> => {
     setSaving(true);
     try {
+      const supabase = getSupabase();
       const { error } = await supabase
         .from('hero_talents')
         .upsert({
@@ -460,6 +467,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   const addSkill = async (skill: Omit<Skill, 'id'>): Promise<Skill | null> => {
     setSaving(true);
     try {
+      const supabase = getSupabase();
       const { data, error } = await supabase
         .from('skills')
         .insert({
@@ -535,6 +543,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
         delete dbUpdates.isUnique;
       }
 
+      const supabase = getSupabase();
       const { error } = await supabase
         .from('skills')
         .update(dbUpdates)
@@ -558,6 +567,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   const deleteSkill = async (id: number): Promise<boolean> => {
     setSaving(true);
     try {
+      const supabase = getSupabase();
       const { error } = await supabase
         .from('skills')
         .delete()
