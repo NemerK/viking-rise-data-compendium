@@ -141,7 +141,7 @@ export default function TeamBuilderPage() {
     const ids = new Set<number>();
     activeTeam.members.forEach(m => {
       m.skills.forEach(skill => {
-        if (skill) ids.add(skill.id);
+        if (skill && typeof skill.id === 'number') ids.add(skill.id);
       });
     });
     return ids;
@@ -161,7 +161,7 @@ export default function TeamBuilderPage() {
     return skills.filter(s => {
       const matchesSearch = s.name.toLowerCase().includes(search.toLowerCase());
       const matchesType = typeFilter === 'All' || s.type === typeFilter;
-      const notAlreadyUsed = !usedSkillIds.has(s.id as number);
+      const notAlreadyUsed = typeof s.id === 'number' ? !usedSkillIds.has(s.id) : true;
       return matchesSearch && matchesType && !s.isUnique && notAlreadyUsed;
     });
   }, [skills, search, typeFilter, usedSkillIds]);
