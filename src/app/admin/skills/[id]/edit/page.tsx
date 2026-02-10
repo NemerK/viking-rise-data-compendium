@@ -10,7 +10,7 @@ export default function EditSkillPage() {
   const router = useRouter();
   const params = useParams();
   const { getSkill, updateSkill, deleteSkill, loading, saving } = useAdmin();
-  const skillId = typeof params.id === 'string' ? parseInt(params.id) : params.id as number;
+  const skillId = typeof params.id === 'string' ? parseInt(params.id) : Array.isArray(params.id) ? parseInt(params.id[0]) : 0;
   
   const [formData, setFormData] = useState<Partial<Skill> | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
