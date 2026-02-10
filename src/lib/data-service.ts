@@ -96,34 +96,44 @@ let cacheLoadingPromise: Promise<void> | null = null;
 
 // Fetch all heroes
 export async function getHeroes(): Promise<Hero[]> {
-  const supabase = getSupabase();
-  const { data, error } = await supabase
-    .from('heroes')
-    .select('*')
-    .order('id');
+  try {
+    const supabase = getSupabase();
+    const { data, error } = await supabase
+      .from('heroes')
+      .select('*')
+      .order('id');
 
-  if (error) {
-    console.error('Error fetching heroes:', error);
+    if (error) {
+      console.error('Error fetching heroes:', error);
+      return [];
+    }
+
+    return (data || []).map(transformHero);
+  } catch (err) {
+    console.error('Failed to initialize Supabase or fetch heroes:', err);
     return [];
   }
-
-  return (data || []).map(transformHero);
 }
 
 // Fetch all skills
 export async function getSkills(): Promise<Skill[]> {
-  const supabase = getSupabase();
-  const { data, error } = await supabase
-    .from('skills')
-    .select('*')
-    .order('id');
+  try {
+    const supabase = getSupabase();
+    const { data, error } = await supabase
+      .from('skills')
+      .select('*')
+      .order('id');
 
-  if (error) {
-    console.error('Error fetching skills:', error);
+    if (error) {
+      console.error('Error fetching skills:', error);
+      return [];
+    }
+
+    return (data || []).map(transformSkill);
+  } catch (err) {
+    console.error('Failed to initialize Supabase or fetch skills:', err);
     return [];
   }
-
-  return (data || []).map(transformSkill);
 }
 
 // Load hero skills and talents cache
@@ -144,6 +154,9 @@ async function loadHeroSkillsCache(): Promise<void> {
         supabase.from('hero_skills').select('*').order('hero_id'),
         supabase.from('hero_talents').select('*').order('hero_id'),
       ]);
+      
+      if (skillsResult.error) console.error('Error fetching hero_skills:', skillsResult.error);
+      if (talentsResult.error) console.error('Error fetching hero_talents:', talentsResult.error);
 
       const skills = skillsResult.data || [];
       const talents = talentsResult.data || [];
