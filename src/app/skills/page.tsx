@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
-import { skills } from '@/data/skills';
+import { Skill } from '@/types';
+import { getSkills } from '@/lib/data-service';
 
 // Get effect label
 function getEffectLabel(effect: string): { icon: string; label: string } {
@@ -47,12 +48,32 @@ function getTypeColor(type: string): string {
 }
 
 export default function SkillsPage() {
+  const [skills, setSkills] = useState<Skill[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('All');
-  const [selectedSkill, setSelectedSkill] = useState<typeof skills[0] | null>(null);
+  const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
+
+  // Fetch skills from Supabase
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+      try {
+        const skillsData = await getSkills();
+        setSkills(skillsData);
+      } catch (error) {
+        console.error('Error fetching skills:', error);
+      }
+      setLoading(false);
+    }
+    fetchData();
+  }, []);
 
   // Get unique types
-  const skillTypes = ['All', ...new Set(skills.map(s => s.type).filter(t => t !== 'N/A'))];
+  const skillTypes = useMemo(() => 
+    ['All', ...new Set(skills.map(s => s.type).filter(t => t !== 'N/A'))],
+    [skills]
+  );
 
   // Filter skills
   const filteredSkills = useMemo(() => {
@@ -61,7 +82,18 @@ export default function SkillsPage() {
       const matchesType = typeFilter === 'All' || skill.type === typeFilter;
       return matchesSearch && matchesType;
     });
-  }, [search, typeFilter]);
+  }, [skills, search, typeFilter]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500 mx-auto mb-4"></div>
+          <p className="text-slate-400">Loading skills...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen py-8">
@@ -119,7 +151,7 @@ export default function SkillsPage() {
                 {/* Icon */}
                 <div className="relative w-16 h-16 flex-shrink-0">
                   <Image
-                    src={skill.icon}
+                    src={skill.icon || '/images/skills/diamond/none.png'}
                     alt={skill.name}
                     fill
                     className="object-contain rounded-lg"
@@ -177,7 +209,7 @@ export default function SkillsPage() {
               <div className="flex items-start gap-4 mb-6">
                 <div className="relative w-20 h-20 flex-shrink-0">
                   <Image
-                    src={selectedSkill.icon}
+                    src={selectedSkill.icon || '/images/skills/diamond/none.png'}
                     alt={selectedSkill.name}
                     fill
                     className="object-contain rounded-lg"

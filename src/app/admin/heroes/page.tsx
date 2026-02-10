@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { useAdmin } from '../context/AdminContext';
 
 export default function HeroesPage() {
-  const { state } = useAdmin();
+  const { state, heroSkills, heroTalents, loading, error } = useAdmin();
   const [search, setSearch] = useState('');
   const [rarityFilter, setRarityFilter] = useState<string>('All');
   const [troopTypeFilter, setTroopTypeFilter] = useState<string>('All');
@@ -15,7 +15,7 @@ export default function HeroesPage() {
     return state.heroes.filter(hero => {
       const matchesSearch = hero.name.toLowerCase().includes(search.toLowerCase());
       const matchesRarity = rarityFilter === 'All' || hero.rarity === rarityFilter || (!hero.rarity && rarityFilter === 'Unclassified');
-      const matchesTroopType = troopTypeFilter === 'All' || hero.troopType === troopTypeFilter || (!hero.troopType && troopTypeFilter === 'Legacy');
+      const matchesTroopType = troopTypeFilter === 'All' || hero.troopType === troopTypeFilter || hero.herotype === troopTypeFilter || (!hero.troopType && !hero.herotype && troopTypeFilter === 'Legacy');
       return matchesSearch && matchesRarity && matchesTroopType;
     });
   }, [state.heroes, search, rarityFilter, troopTypeFilter]);
@@ -28,6 +28,26 @@ export default function HeroesPage() {
       default: return 'text-gray-500 border-gray-500';
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500 mx-auto mb-4"></div>
+          <p className="text-gray-400">Loading heroes from database...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-20">
+        <div className="text-red-500 text-xl mb-4">Error loading data</div>
+        <p className="text-gray-400">{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -93,51 +113,57 @@ export default function HeroesPage() {
 
       {/* Heroes Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {filteredHeroes.map(hero => (
-          <Link
-            key={hero.id}
-            href={`/admin/heroes/${hero.id}/edit`}
-            className="glass-card p-4 border border-amber-500/20 rounded-lg hover:border-amber-500/50 transition-all group"
-          >
-            <div className="flex items-center space-x-4">
-              <div className="relative w-16 h-16 rounded-lg overflow-hidden border-2 border-gray-700 group-hover:border-amber-500 transition-colors">
-                <Image
-                  src={hero.portrait}
-                  alt={hero.name}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-lg font-bold text-white truncate group-hover:text-amber-500 transition-colors">
-                  {hero.name}
-                </h3>
-                <div className="flex flex-wrap gap-1 mt-1">
-                  {hero.rarity && (
-                    <span className={`text-xs px-2 py-0.5 rounded border ${getRarityColor(hero.rarity)}`}>
-                      {hero.rarity}
-                    </span>
-                  )}
-                  {hero.troopType && (
-                    <span className="text-xs px-2 py-0.5 rounded border border-gray-500 text-gray-400">
-                      {hero.troopType}
-                    </span>
-                  )}
-                  {!hero.rarity && !hero.troopType && (
-                    <span className="text-xs px-2 py-0.5 rounded border border-yellow-500 text-yellow-500">
-                      Needs Update
-                    </span>
-                  )}
+        {filteredHeroes.map(hero => {
+          const skills = heroSkills.get(hero.id) || [];
+          const talents = heroTalents.get(hero.id) || [];
+          const hasAllSkills = skills.length >= 3;
+          const hasAllTalents = talents.length >= 3;
+          
+          return (
+            <Link
+              key={hero.id}
+              href={`/admin/heroes/${hero.id}/edit`}
+              className="glass-card p-4 border border-amber-500/20 rounded-lg hover:border-amber-500/50 transition-all group"
+            >
+              <div className="flex items-center space-x-4">
+                <div className="relative w-16 h-16 rounded-lg overflow-hidden border-2 border-gray-700 group-hover:border-amber-500 transition-colors">
+                  <Image
+                    src={hero.portrait}
+                    alt={hero.name}
+                    fill
+                    className="object-cover"
+                  />
                 </div>
-                {hero.season && (
-                  <div className="text-xs text-gray-500 mt-1">
-                    {hero.season}
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-lg font-bold text-white truncate group-hover:text-amber-500 transition-colors">
+                    {hero.name}
+                  </h3>
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {hero.rarity && (
+                      <span className={`text-xs px-2 py-0.5 rounded border ${getRarityColor(hero.rarity)}`}>
+                        {hero.rarity}
+                      </span>
+                    )}
+                    {(hero.troopType || hero.herotype) && (
+                      <span className="text-xs px-2 py-0.5 rounded border border-gray-500 text-gray-400">
+                        {hero.troopType || hero.herotype}
+                      </span>
+                    )}
                   </div>
-                )}
+                  {/* Skills & Talents status */}
+                  <div className="flex gap-2 mt-2 text-[10px]">
+                    <span className={`px-1.5 py-0.5 rounded ${hasAllSkills ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
+                      {skills.length}/3 Skills
+                    </span>
+                    <span className={`px-1.5 py-0.5 rounded ${hasAllTalents ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
+                      {talents.length}/3 Talents
+                    </span>
+                  </div>
+                </div>
               </div>
-            </div>
-          </Link>
-        ))}
+            </Link>
+          );
+        })}
       </div>
 
       {filteredHeroes.length === 0 && (

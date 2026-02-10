@@ -9,42 +9,79 @@ import ImageUploader from '../../../components/ImageUploader';
 export default function EditSkillPage() {
   const router = useRouter();
   const params = useParams();
-  const { getSkill, updateSkill, deleteSkill } = useAdmin();
-  const skillId = params.id as string | number;
+  const { getSkill, updateSkill, deleteSkill, loading, saving } = useAdmin();
+  const skillId = typeof params.id === 'string' ? parseInt(params.id) : params.id as number;
   
   const [formData, setFormData] = useState<Partial<Skill> | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<string>('');
 
   useEffect(() => {
-    const skill = getSkill(skillId);
-    if (skill) {
-      setFormData(skill);
-    } else {
-      router.push('/admin/skills');
+    if (!loading) {
+      const skill = getSkill(skillId);
+      if (skill) {
+        setFormData(skill);
+      } else {
+        router.push('/admin/skills');
+      }
     }
-  }, [skillId, getSkill, router]);
+  }, [skillId, getSkill, router, loading]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData || !formData.name || !formData.description) {
       alert('Please fill in required fields (Name, Description)');
       return;
     }
-    updateSkill(skillId, formData);
-    router.push('/admin/skills');
+    
+    setSaveStatus('Saving...');
+    const success = await updateSkill(skillId, formData);
+    
+    if (success) {
+      setSaveStatus('Saved!');
+      setTimeout(() => router.push('/admin/skills'), 500);
+    } else {
+      setSaveStatus('Error saving');
+    }
   };
 
-  const handleDelete = () => {
-    deleteSkill(skillId);
-    router.push('/admin/skills');
+  const handleDelete = async () => {
+    const success = await deleteSkill(skillId);
+    if (success) {
+      router.push('/admin/skills');
+    }
   };
 
   const updateField = (field: string, value: any) => {
     setFormData(prev => prev ? { ...prev, [field]: value } : null);
   };
 
-  if (!formData) {
-    return <div className="text-white">Loading...</div>;
+  const toggleEffect = (effect: string) => {
+    setFormData(prev => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        effects: { ...prev.effects, [effect]: !prev.effects?.[effect] }
+      };
+    });
+  };
+
+  const effectOptions = [
+    'burn', 'bleed', 'poison', 'retribution', 'slow', 'counterattack',
+    'basicattack', 'shield', 'heal', 'rage', 'silence', 'disarm',
+    'brokenblade', 'evasion', 'dispel', 'buff', 'debuff', 'directdamage',
+    'immunitycontrol', 'purify', 'devastation', 'damagereduction', 'lacerate'
+  ];
+
+  if (loading || !formData) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
+          <p className="text-gray-400">Loading skill...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -53,25 +90,28 @@ export default function EditSkillPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-purple-500">Edit Skill: {formData.name}</h1>
-          <p className="text-gray-400">Update skill information</p>
+          <p className="text-gray-400">Update slottable skill information</p>
         </div>
         <button
           onClick={() => setShowDeleteConfirm(true)}
           className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-500 transition-colors"
         >
-          🗑️ Delete
+          Delete
         </button>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Icons & Basic Info */}
         <div className="glass-card p-6 border border-purple-500/20 rounded-lg">
-          <h2 className="text-xl font-bold text-white mb-4">📷 Skill Icons & Info</h2>
+          <h2 className="text-xl font-bold text-white mb-4">Skill Icon &amp; Info</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="flex flex-col items-center gap-4">
               <ImageUploader
-                value={formData.iconDiamond || ''}
-                onChange={(url) => updateField('iconDiamond', url)}
+                value={formData.iconDiamond || formData.icon || ''}
+                onChange={(url) => {
+                  updateField('iconDiamond', url);
+                  updateField('icon', url);
+                }}
                 folder="viking-rise/skills/diamond"
                 shape="diamond"
                 size="large"
@@ -154,21 +194,53 @@ export default function EditSkillPage() {
           </div>
         </div>
 
+        {/* Effects */}
+        <div className="glass-card p-6 border border-purple-500/20 rounded-lg">
+          <h2 className="text-xl font-bold text-white mb-4">Skill Effects</h2>
+          <p className="text-gray-400 text-sm mb-4">Select all effects this skill provides:</p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
+            {effectOptions.map((effect) => (
+              <button
+                key={effect}
+                type="button"
+                onClick={() => toggleEffect(effect)}
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  formData.effects?.[effect]
+                    ? 'bg-purple-500 text-white'
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                }`}
+              >
+                {effect}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Actions */}
-        <div className="flex justify-end space-x-4">
-          <button
-            type="button"
-            onClick={() => router.push('/admin/skills')}
-            className="px-6 py-3 bg-gray-700 text-white font-medium rounded-lg hover:bg-gray-600 transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="px-6 py-3 bg-purple-500 text-white font-bold rounded-lg hover:bg-purple-400 transition-colors"
-          >
-            Save Changes
-          </button>
+        <div className="flex justify-between items-center">
+          <div className="text-sm">
+            {saveStatus && (
+              <span className={saveStatus.includes('Error') ? 'text-red-400' : 'text-green-400'}>
+                {saveStatus}
+              </span>
+            )}
+          </div>
+          <div className="flex space-x-4">
+            <button
+              type="button"
+              onClick={() => router.push('/admin/skills')}
+              className="px-6 py-3 bg-gray-700 text-white font-medium rounded-lg hover:bg-gray-600 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={saving}
+              className="px-6 py-3 bg-purple-500 text-white font-bold rounded-lg hover:bg-purple-400 transition-colors disabled:opacity-50"
+            >
+              {saving ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
         </div>
       </form>
 
@@ -189,9 +261,10 @@ export default function EditSkillPage() {
               </button>
               <button
                 onClick={handleDelete}
-                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                disabled={saving}
+                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50"
               >
-                Delete
+                {saving ? 'Deleting...' : 'Delete'}
               </button>
             </div>
           </div>

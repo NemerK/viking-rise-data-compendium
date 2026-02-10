@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@google-cloud/translate": "^9.2.1",
+    "@supabase/supabase-js": "^2.95.3",
     "cloudinary": "^2.8.0",
     "html2canvas": "^1.4.1",
     "next": "^16.1.1",
@@ -24,9 +25,11 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^17.2.4",
     "eslint": "^9",
     "eslint-config-next": "15.5.5",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }

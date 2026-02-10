@@ -3,57 +3,98 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAdmin } from '../../context/AdminContext';
-import { Skill } from '@/types';
 import ImageUploader from '../../components/ImageUploader';
 
 export default function NewSkillPage() {
   const router = useRouter();
-  const { addSkill, state } = useAdmin();
+  const { addSkill, saving } = useAdmin();
+  const [saveStatus, setSaveStatus] = useState<string>('');
   
-  const [formData, setFormData] = useState<Partial<Skill>>({
-    id: `skill-${Date.now()}`,
+  const [formData, setFormData] = useState({
     name: '',
+    icon: '',
     iconRegular: '',
     iconDiamond: '',
     type: 'active',
-    probability: 0,
+    probability: 100,
     description: '',
-    isUnique: false,
-    heroId: undefined,
-    effects: {},
+    effects: {} as Record<string, boolean>,
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.description) {
       alert('Please fill in required fields (Name, Description)');
       return;
     }
-    addSkill(formData as Skill);
-    router.push('/admin/skills');
+    
+    setSaveStatus('Creating...');
+    const result = await addSkill({
+      name: formData.name,
+      icon: formData.iconDiamond || formData.icon,
+      iconRegular: formData.iconRegular,
+      iconDiamond: formData.iconDiamond,
+      type: formData.type,
+      probability: formData.probability,
+      description: formData.description,
+      isUnique: false,
+      effects: formData.effects,
+    });
+    
+    if (result) {
+      setSaveStatus('Created!');
+      router.push('/admin/skills');
+    } else {
+      setSaveStatus('Error creating skill');
+    }
   };
 
   const updateField = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const toggleEffect = (effect: string) => {
+    setFormData(prev => ({
+      ...prev,
+      effects: { ...prev.effects, [effect]: !prev.effects[effect] }
+    }));
+  };
+
+  const effectOptions = [
+    'burn', 'bleed', 'poison', 'retribution', 'slow', 'counterattack',
+    'basicattack', 'shield', 'heal', 'rage', 'silence', 'disarm',
+    'brokenblade', 'evasion', 'dispel', 'buff', 'debuff', 'directdamage',
+    'immunitycontrol', 'purify', 'devastation', 'damagereduction', 'lacerate'
+  ];
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-purple-500">Add New General Skill</h1>
-        <p className="text-gray-400">Create a skill that can be equipped in open skill slots</p>
+        <h1 className="text-3xl font-bold text-purple-500">Add New Slottable Skill</h1>
+        <p className="text-gray-400">Create a skill that can be equipped by any hero in slots 3 &amp; 4</p>
+      </div>
+
+      {/* Info Banner */}
+      <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+        <p className="text-blue-300 text-sm">
+          <strong>Note:</strong> This creates a slottable skill that any hero can equip. 
+          Hero-specific skills (skill 1, skill 2, awakened) are managed on each hero&apos;s edit page.
+        </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Icons & Basic Info */}
         <div className="glass-card p-6 border border-purple-500/20 rounded-lg">
-          <h2 className="text-xl font-bold text-white mb-4">📷 Skill Icons & Info</h2>
+          <h2 className="text-xl font-bold text-white mb-4">Skill Icon &amp; Info</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="flex flex-col items-center gap-4">
               <ImageUploader
                 value={formData.iconDiamond || ''}
-                onChange={(url) => updateField('iconDiamond', url)}
+                onChange={(url) => {
+                  updateField('iconDiamond', url);
+                  if (!formData.icon) updateField('icon', url);
+                }}
                 folder="viking-rise/skills/diamond"
                 shape="diamond"
                 size="large"
@@ -65,7 +106,7 @@ export default function NewSkillPage() {
                 folder="viking-rise/skills"
                 shape="square"
                 size="medium"
-                label="Regular Icon"
+                label="Regular Icon (optional)"
               />
             </div>
             <div className="md:col-span-2 space-y-4">
@@ -125,21 +166,53 @@ export default function NewSkillPage() {
           </div>
         </div>
 
+        {/* Effects */}
+        <div className="glass-card p-6 border border-purple-500/20 rounded-lg">
+          <h2 className="text-xl font-bold text-white mb-4">Skill Effects</h2>
+          <p className="text-gray-400 text-sm mb-4">Select all effects this skill provides:</p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
+            {effectOptions.map((effect) => (
+              <button
+                key={effect}
+                type="button"
+                onClick={() => toggleEffect(effect)}
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  formData.effects[effect]
+                    ? 'bg-purple-500 text-white'
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                }`}
+              >
+                {effect}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Actions */}
-        <div className="flex justify-end space-x-4">
-          <button
-            type="button"
-            onClick={() => router.push('/admin/skills')}
-            className="px-6 py-3 bg-gray-700 text-white font-medium rounded-lg hover:bg-gray-600 transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="px-6 py-3 bg-purple-500 text-white font-bold rounded-lg hover:bg-purple-400 transition-colors"
-          >
-            Create Skill
-          </button>
+        <div className="flex justify-between items-center">
+          <div className="text-sm">
+            {saveStatus && (
+              <span className={saveStatus.includes('Error') ? 'text-red-400' : 'text-green-400'}>
+                {saveStatus}
+              </span>
+            )}
+          </div>
+          <div className="flex space-x-4">
+            <button
+              type="button"
+              onClick={() => router.push('/admin/skills')}
+              className="px-6 py-3 bg-gray-700 text-white font-medium rounded-lg hover:bg-gray-600 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={saving}
+              className="px-6 py-3 bg-purple-500 text-white font-bold rounded-lg hover:bg-purple-400 transition-colors disabled:opacity-50"
+            >
+              {saving ? 'Creating...' : 'Create Skill'}
+            </button>
+          </div>
         </div>
       </form>
     </div>

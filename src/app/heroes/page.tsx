@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { heroes } from '@/data/heroes';
+import { Hero } from '@/types';
+import { getHeroes, getAllHeroSkills, getSkillTypeColor, HeroSkillData } from '@/lib/data-service';
 
 // All abilities for filtering
 const abilityOptions = [
@@ -20,15 +21,96 @@ const abilityOptions = [
   { key: 'brokenblade', label: 'Broken Blade', icon: '⚔️' },
 ];
 
+// Skill Tooltip Component
+function SkillTooltip({ skills, heroName }: { skills: HeroSkillData | null; heroName: string }) {
+  if (!skills) return null;
+  
+  return (
+    <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 z-50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+      <div className="bg-slate-900/95 backdrop-blur-sm border border-slate-700 rounded-lg p-3 min-w-[280px] max-w-[320px] shadow-xl">
+        <div className="text-xs font-bold text-amber-400 mb-2 text-center">{heroName}</div>
+        
+        {/* Skills */}
+        <div className="space-y-2">
+          {skills.skillOne && (
+            <div className="flex items-start gap-2">
+              <span className={`text-[10px] px-1.5 py-0.5 rounded border flex-shrink-0 ${getSkillTypeColor(skills.skillOne.type)}`}>
+                {skills.skillOne.type}
+              </span>
+              <div className="flex-1 min-w-0">
+                <div className="text-[11px] font-semibold text-white truncate">{skills.skillOne.name}</div>
+              </div>
+            </div>
+          )}
+          
+          {skills.skillTwo && (
+            <div className="flex items-start gap-2">
+              <span className={`text-[10px] px-1.5 py-0.5 rounded border flex-shrink-0 ${getSkillTypeColor(skills.skillTwo.type)}`}>
+                {skills.skillTwo.type}
+              </span>
+              <div className="flex-1 min-w-0">
+                <div className="text-[11px] font-semibold text-white truncate">{skills.skillTwo.name}</div>
+              </div>
+            </div>
+          )}
+          
+          {skills.awakenedSkill && (
+            <div className="flex items-start gap-2 pt-1 border-t border-slate-700/50">
+              <span className="text-[10px] px-1.5 py-0.5 rounded border flex-shrink-0 text-yellow-400 bg-yellow-500/20 border-yellow-500/30">
+                Awakened
+              </span>
+              <div className="flex-1 min-w-0">
+                <div className="text-[11px] font-semibold text-yellow-300 truncate">{skills.awakenedSkill.name}</div>
+              </div>
+            </div>
+          )}
+        </div>
+        
+        {/* Arrow */}
+        <div className="absolute left-1/2 -translate-x-1/2 -bottom-1.5 w-3 h-3 bg-slate-900 border-r border-b border-slate-700 rotate-45"></div>
+      </div>
+    </div>
+  );
+}
+
 export default function HeroesPage() {
+  const [heroes, setHeroes] = useState<Hero[]>([]);
+  const [heroSkillsMap, setHeroSkillsMap] = useState<Map<number, HeroSkillData>>(new Map());
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('All');
   const [classFilter, setClassFilter] = useState('All');
   const [abilityFilter, setAbilityFilter] = useState('All');
 
-  // Get unique types and classes
-  const heroTypes = ['All', ...new Set(heroes.map(h => h.herotype))];
-  const heroClasses = ['All', ...new Set(heroes.map(h => h.heroclass))];
+  // Fetch heroes and skills from Supabase
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+      try {
+        // Fetch heroes and skills in parallel
+        const [heroesData, skillsMap] = await Promise.all([
+          getHeroes(),
+          getAllHeroSkills()
+        ]);
+        setHeroes(heroesData);
+        setHeroSkillsMap(skillsMap);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+      setLoading(false);
+    }
+    fetchData();
+  }, []);
+
+  // Get unique types and classes (filter out undefined/empty values)
+  const heroTypes = useMemo(() => 
+    ['All', ...new Set(heroes.map(h => h.herotype).filter((t): t is string => !!t))],
+    [heroes]
+  );
+  const heroClasses = useMemo(() => 
+    ['All', ...new Set(heroes.map(h => h.heroclass).filter((c): c is string => !!c))],
+    [heroes]
+  );
 
   // Filter heroes
   const filteredHeroes = useMemo(() => {
@@ -40,7 +122,18 @@ export default function HeroesPage() {
       
       return matchesSearch && matchesType && matchesClass && matchesAbility;
     });
-  }, [search, typeFilter, classFilter, abilityFilter]);
+  }, [heroes, search, typeFilter, classFilter, abilityFilter]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500 mx-auto mb-4"></div>
+          <p className="text-slate-400">Loading heroes...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen py-6">
@@ -51,17 +144,17 @@ export default function HeroesPage() {
           <p className="text-sm text-slate-400">{heroes.length} heroes available</p>
         </div>
 
-        {/* Filters - Compact */}
+        {/* Filters */}
         <div className="glass-card p-4 mb-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {/* Search */}
-            <div>
+            <div className="col-span-2 sm:col-span-1">
               <input
                 type="text"
                 placeholder="Search..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="input-dark text-sm h-9"
+                className="input-dark text-sm h-10 w-full"
               />
             </div>
             
@@ -70,7 +163,7 @@ export default function HeroesPage() {
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className="select-dark text-sm h-9"
+                className="select-dark h-10 w-full"
               >
                 {heroTypes.map(type => (
                   <option key={type} value={type}>{type}</option>
@@ -83,7 +176,7 @@ export default function HeroesPage() {
               <select
                 value={classFilter}
                 onChange={(e) => setClassFilter(e.target.value)}
-                className="select-dark text-sm h-9"
+                className="select-dark h-10 w-full"
               >
                 {heroClasses.map(cls => (
                   <option key={cls} value={cls}>{cls}</option>
@@ -96,7 +189,7 @@ export default function HeroesPage() {
               <select
                 value={abilityFilter}
                 onChange={(e) => setAbilityFilter(e.target.value)}
-                className="select-dark text-sm h-9"
+                className="select-dark h-10 w-full"
               >
                 <option value="All">All Abilities</option>
                 {abilityOptions.map(ability => (
@@ -112,7 +205,7 @@ export default function HeroesPage() {
           </div>
         </div>
 
-        {/* Heroes Grid - Clean Item Style */}
+        {/* Heroes Grid - Clean Item Style with skill tooltips */}
         <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12 gap-3">
           {filteredHeroes.map((hero) => (
             <Link
@@ -120,6 +213,9 @@ export default function HeroesPage() {
               href={`/heroes/${encodeURIComponent(hero.name)}`}
               className="group relative pb-5"
             >
+              {/* Skill Tooltip on hover */}
+              <SkillTooltip skills={heroSkillsMap.get(hero.id) || null} heroName={hero.name} />
+              
               <div className="relative w-full aspect-square transition-all duration-300 hover:scale-110 hover:z-10 group-hover:drop-shadow-[0_0_15px_rgba(255,215,0,0.8)]">
                 <Image
                   src={hero.portrait}
