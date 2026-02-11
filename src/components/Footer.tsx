@@ -1,6 +1,16 @@
+'use client';
+
+import { usePathname } from 'next/navigation';
+
 export default function Footer() {
+  const pathname = usePathname();
   const currentYear = new Date().getFullYear();
   
+  // Hide footer on admin pages
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
+
   return (
     <footer className="relative z-10 mt-auto border-t border-slate-800/50 bg-slate-900/80 backdrop-blur-sm">
       <div className="max-w-7xl mx-auto px-4 py-8">

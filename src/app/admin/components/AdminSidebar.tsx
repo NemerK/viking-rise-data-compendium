@@ -75,15 +75,6 @@ export default function AdminSidebar() {
         })}
       </nav>
 
-      {/* Info */}
-      <div className="absolute bottom-16 left-0 right-0 px-4">
-        <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-          <p className="text-xs text-blue-300">
-            💾 Changes save directly to database - no deployment needed!
-          </p>
-        </div>
-      </div>
-
       {/* Back to Site */}
       <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-amber-500/20">
         <Link
