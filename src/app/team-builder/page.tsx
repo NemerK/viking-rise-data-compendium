@@ -393,7 +393,8 @@ export default function TeamBuilderPage() {
         skillType = skill.type;
         skillDescription = skill.description;
         skillProbability = skill.probability;
-        skillIcon = getSkillIcon(skill.type);
+        // Use uploaded icon if available, otherwise fall back to generic
+        skillIcon = skill.icon || getSkillIcon(skill.type);
         hasSkill = true;
       }
     } else if (isAwakened && heroSkillData?.awakenedSkill) {
@@ -401,7 +402,8 @@ export default function TeamBuilderPage() {
       skillType = 'Awakened';
       skillDescription = heroSkillData.awakenedSkill.description;
       skillProbability = heroSkillData.awakenedSkill.probability;
-      skillIcon = getSkillIcon('', true);
+      // Use uploaded awakened icon if available
+      skillIcon = heroSkillData.awakenedSkill.icon || getSkillIcon('', true);
       hasSkill = true;
     } else if (isSlottable && member.skills[slotIndex]) {
       const skill = member.skills[slotIndex]!;
